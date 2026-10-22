@@ -1,0 +1,84 @@
+/*
+ * Jetons du design system PISTIS.
+ * Toute couleur, taille ou rayon de l'application vient d'ici : on ne met jamais
+ * de valeur en dur dans un composant. Modifier l'identité = modifier ce fichier.
+ */
+:root {
+  /* Surfaces */
+  --surface-background: #eaf7fc;
+  --surface-card: #ffffff;
+  --surface-warm: #f7ede5;
+  --surface-sunken: #f3f8fb;
+
+  /* Marque */
+  --brand-primary: #32aedc;
+  --brand-primary-strong: #1d7ea6; /* texte cliquable : contraste AA sur blanc */
+  --brand-primary-soft: rgba(50, 174, 220, 0.14);
+
+  /* Texte */
+  --text-primary: #252b32;
+  --text-secondary: #5e6873;
+  --text-on-brand: #ffffff;
+
+  /* États (ton neutre : jamais de rouge culpabilisant pour un objectif) */
+  --status-positive: #2f9e6e;
+  --status-positive-soft: rgba(47, 158, 110, 0.12);
+  --status-attention: #b7791f;
+  --status-attention-soft: rgba(183, 121, 31, 0.12);
+  --status-alert: #c0392b;
+  --status-alert-soft: rgba(192, 57, 43, 0.1);
+
+  --border-subtle: #dde8ee;
+
+  /* Typographie (Inter auto-hébergée prévue en M1 ; police système en attendant) */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-amount: 34px;
+  --text-title: 24px;
+  --text-body: 17px;
+  --text-secondary-size: 15px;
+  --text-caption: 13px;
+
+  /* Espaces (grille de 4) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Formes */
+  --radius-card: 20px;
+  --radius-control: 14px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(37, 43, 50, 0.04), 0 8px 24px rgba(37, 43, 50, 0.05);
+
+  /* Mouvement */
+  --motion-fast: 150ms;
+  --motion-base: 240ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface-background: #11161b;
+    --surface-card: #1b2229;
+    --surface-warm: #2a2420;
+    --surface-sunken: #161c22;
+    --brand-primary: #4fc0ea;
+    --brand-primary-strong: #7fd3f2;
+    --brand-primary-soft: rgba(79, 192, 234, 0.16);
+    --text-primary: #eef2f5;
+    --text-secondary: #a3adb7;
+    --border-subtle: #2a333c;
+    --shadow-card: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+  }
+}
