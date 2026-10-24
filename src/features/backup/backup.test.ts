@@ -114,8 +114,8 @@ describe('chiffrement', () => {
     const { bytes } = await exportBackup(db, { appVersion: 'test', password: 'motdepasse-solide', iterations: FAST, clock });
     expect(new TextDecoder().decode(bytes.subarray(0, 10))).toBe('PISTISENC1');
     expect(new TextDecoder().decode(bytes)).not.toContain('Zobinou');
-    await expect(readBackup(bytes)).rejects.toThrow(/chiffrée/);
-    await expect(readBackup(bytes, 'mauvais-mot-de-passe', FAST)).rejects.toThrow(/incorrect/);
+    await expect(readBackup(bytes)).rejects.toMatchObject({ code: 'backup.needsPassword' });
+    await expect(readBackup(bytes, 'mauvais-mot-de-passe', FAST)).rejects.toMatchObject({ code: 'backup.wrongPassword' });
     const parsed = await readBackup(bytes, 'motdepasse-solide', FAST);
     expect(parsed.encrypted).toBe(true);
     expect(parsed.tables.profile[0]).toMatchObject({ nickname: 'JC' });
@@ -123,14 +123,17 @@ describe('chiffrement', () => {
 
   it('refuse un mot de passe trop court', async () => {
     const { db } = await seededDb();
-    await expect(exportBackup(db, { appVersion: 'test', password: 'court', iterations: FAST })).rejects.toThrow(/8 caractères/);
+    await expect(exportBackup(db, { appVersion: 'test', password: 'court', iterations: FAST })).rejects.toMatchObject({
+      code: 'backup.passwordTooShort',
+      params: { min: 8 },
+    });
   });
 
   it('détecte un fichier chiffré modifié', async () => {
     const { db } = await seededDb();
     const { bytes } = await exportBackup(db, { appVersion: 'test', password: 'motdepasse-solide', iterations: FAST, clock });
     bytes[bytes.length - 5] ^= 0xff;
-    await expect(readBackup(bytes, 'motdepasse-solide', FAST)).rejects.toThrow(/endommagé/);
+    await expect(readBackup(bytes, 'motdepasse-solide', FAST)).rejects.toMatchObject({ code: 'backup.wrongPassword' });
   });
 });
 
@@ -140,15 +143,15 @@ describe('fichiers invalides ou piégés', () => {
     const { bytes } = await exportBackup(db, { appVersion: 'test', clock });
     const entries = unzipSync(bytes);
     entries['data.json'] = strToU8(new TextDecoder().decode(entries['data.json']).replace('JC', 'XX'));
-    await expect(readBackup(zipSync(entries))).rejects.toThrow(/altéré/);
+    await expect(readBackup(zipSync(entries))).rejects.toMatchObject({ code: 'backup.alteredFile' });
     expect(await getProfile(db)).toMatchObject({ nickname: 'JC' });
   });
 
   it('refuse ce qui n’est pas une sauvegarde PISTIS', async () => {
-    await expect(readBackup(new Uint8Array())).rejects.toThrow(/vide/);
-    await expect(readBackup(new Uint8Array([1, 2, 3, 4]))).rejects.toThrow(/lisible/);
+    await expect(readBackup(new Uint8Array())).rejects.toMatchObject({ code: 'backup.empty' });
+    await expect(readBackup(new Uint8Array([1, 2, 3, 4]))).rejects.toMatchObject({ code: 'backup.unreadable' });
     const foreign = zipSync({ 'manifest.json': strToU8(JSON.stringify({ format: 'autre' })) });
-    await expect(readBackup(foreign)).rejects.toThrow(/pas une sauvegarde PISTIS/);
+    await expect(readBackup(foreign)).rejects.toMatchObject({ code: 'backup.notPistis' });
   });
 
   it('refuse un manifeste incomplet sans planter', async () => {
@@ -156,14 +159,16 @@ describe('fichiers invalides ou piégés', () => {
     const { bytes } = await exportBackup(db, { appVersion: 'test', clock });
     const entries = unzipSync(bytes);
     const broken = await rezip(entries, (m) => delete m.files);
-    await expect(readBackup(broken)).rejects.toThrow(/manifeste incomplet/);
+    await expect(readBackup(broken)).rejects.toMatchObject({ code: 'backup.incompleteManifest' });
   });
 
   it('refuse un fichier inattendu dans l’archive (chemin piégé)', async () => {
     const { db } = await seededDb();
     const { bytes } = await exportBackup(db, { appVersion: 'test', clock });
     const entries = unzipSync(bytes);
-    await expect(readBackup(zipSync({ ...entries, '../../evil.js': strToU8('alert(1)') }))).rejects.toThrow(/inattendu/);
+    await expect(readBackup(zipSync({ ...entries, '../../evil.js': strToU8('alert(1)') }))).rejects.toMatchObject({
+      code: 'backup.unexpectedFile',
+    });
   });
 
   it('refuse des valeurs de type inattendu, même avec des empreintes valides', async () => {
@@ -173,7 +178,10 @@ describe('fichiers invalides ou piégés', () => {
     const data = JSON.parse(new TextDecoder().decode(entries['data.json']));
     data.profile[0].nickname = { piège: true };
     entries['data.json'] = strToU8(JSON.stringify(data));
-    await expect(readBackup(await rezip(entries))).rejects.toThrow(/Valeur invalide/);
+    await expect(readBackup(await rezip(entries))).rejects.toMatchObject({
+      code: 'backup.invalidRow',
+      params: { detail: 'profile.nickname' },
+    });
   });
 
   it('refuse une colonne inconnue du schéma', async () => {
@@ -184,7 +192,7 @@ describe('fichiers invalides ou piégés', () => {
     data.profile[0].colonne_fantome = 'x';
     entries['data.json'] = strToU8(JSON.stringify(data));
     const target = await emptyDb();
-    await expect(restoreBackup(target, await readBackup(await rezip(entries)))).rejects.toThrow(/Colonnes inconnues/);
+    await expect(restoreBackup(target, await readBackup(await rezip(entries)))).rejects.toMatchObject({ code: 'backup.unknownColumns' });
     expect(await getProfile(target)).toMatchObject({ nickname: 'Autre' });
   });
 
@@ -192,7 +200,7 @@ describe('fichiers invalides ou piégés', () => {
     const { db } = await seededDb();
     const { bytes } = await exportBackup(db, { appVersion: 'test', clock });
     const newer = await rezip(unzipSync(bytes), (m) => (m.schemaVersion = 99));
-    await expect(readBackup(newer)).rejects.toThrow(/plus récente/);
+    await expect(readBackup(newer)).rejects.toMatchObject({ code: 'backup.newerVersion' });
   });
 });
 

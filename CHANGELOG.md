@@ -1,5 +1,28 @@
 # Historique des versions
 
+## 0.1.0-m1 — 25 octobre 2026
+
+Jalon M1 : fondations de l'application, nouvelle identité visuelle « bleu nuit et cyan ».
+
+### Ajouté
+
+- Design system complet : thème sombre par défaut et thème clair, police Inter embarquée, icônes, tuiles de domaine,
+  anneau et barres de progression, onglets segmentés, listes, badges. Contrastes AA vérifiés (docs/design-system.md).
+- Nouvelle marque et icône d'application ; écran de bienvenue illustré (dessin original).
+- Accueil en deux étapes : besoins (6 domaines) puis profil ; « Déjà un espace ? » restaure une sauvegarde sur un nouvel appareil.
+- Tableau de bord : semaine en cours, priorité du jour (prochaine étape réelle), message du jour, premiers pas, domaines actifs.
+- Navigation à 5 onglets (bas sur téléphone, barre latérale sur ordinateur). Les modules à venir annoncent leur jalon.
+- Profil et paramètres : domaines, apparence (clair / système / sombre, animations réduites), langue, sauvegardes,
+  confidentialité et diagnostic de l'appareil. Centre de notifications (vide jusqu'au jalon M6).
+- Français et anglais : tous les textes traduits, langue du navigateur proposée par défaut.
+- Bouton d'installation de l'application quand le navigateur le permet.
+
+### Modifié
+
+- Les erreurs sont des codes traduits dans l'interface (plus aucun texte en dur dans la logique).
+- Polices latines mises en cache pour le hors ligne.
+- 54 tests unitaires et 12 parcours navigateur.
+
 ## 0.0.2-m0 — 24 octobre 2026
 
 Revue complète du jalon M0 : fiabilité, sécurité, accessibilité et outillage.

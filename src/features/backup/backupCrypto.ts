@@ -1,3 +1,4 @@
+import { PistisError } from '../../core/errors';
 /**
  * Chiffrement facultatif des sauvegardes, avec la cryptographie intégrée au navigateur (WebCrypto).
  *
@@ -13,6 +14,7 @@ const MAGIC = new TextEncoder().encode('PISTISENC1');
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
 export const PBKDF2_ITERATIONS = 600_000;
+export const MIN_PASSWORD_LENGTH = 8;
 
 export function isEncrypted(bytes: Uint8Array): boolean {
   return bytes.length > MAGIC.length && MAGIC.every((b, i) => bytes[i] === b);
@@ -30,7 +32,7 @@ async function deriveKey(password: string, salt: Uint8Array, iterations: number)
 }
 
 export async function encryptBytes(plain: Uint8Array, password: string, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
-  if (password.length < 8) throw new Error('Le mot de passe de sauvegarde fait au moins 8 caractères.');
+  if (password.length < MIN_PASSWORD_LENGTH) throw new PistisError('backup.passwordTooShort', { min: MIN_PASSWORD_LENGTH });
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
   const iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
   const key = await deriveKey(password, salt, iterations);
@@ -44,7 +46,7 @@ export async function encryptBytes(plain: Uint8Array, password: string, iteratio
 }
 
 export async function decryptBytes(file: Uint8Array, password: string, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
-  if (!isEncrypted(file)) throw new Error("Ce fichier n'est pas une sauvegarde chiffrée.");
+  if (!isEncrypted(file)) throw new PistisError('backup.notEncrypted');
   const salt = file.subarray(MAGIC.length, MAGIC.length + SALT_BYTES);
   const iv = file.subarray(MAGIC.length + SALT_BYTES, MAGIC.length + SALT_BYTES + IV_BYTES);
   const cipher = file.subarray(MAGIC.length + SALT_BYTES + IV_BYTES);
@@ -52,6 +54,6 @@ export async function decryptBytes(file: Uint8Array, password: string, iteration
   try {
     return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv as BufferSource }, key, cipher as BufferSource));
   } catch {
-    throw new Error('Mot de passe incorrect ou fichier endommagé.');
+    throw new PistisError('backup.wrongPassword');
   }
 }

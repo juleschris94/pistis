@@ -1,3 +1,4 @@
+import type { ErrorCode, ErrorParams } from '../../core/errors';
 /**
  * Règles pures sur les images (testables sans navigateur).
  * Le type est déterminé par les premiers octets du fichier, jamais par son extension.
@@ -30,16 +31,15 @@ function ascii(b: Uint8Array, start: number, end: number): string {
   return String.fromCharCode(...b.subarray(start, end));
 }
 
-export type MediaCheck = { ok: true; mime: ImageMime } | { ok: false; reason: string };
+export type MediaCheck = { ok: true; mime: ImageMime } | { ok: false; code: ErrorCode; params?: ErrorParams };
 
 export function checkImage(bytes: Uint8Array): MediaCheck {
-  if (bytes.length === 0) return { ok: false, reason: 'Le fichier est vide.' };
+  if (bytes.length === 0) return { ok: false, code: 'image.empty' };
   if (bytes.length > MEDIA_LIMITS.maxInputBytes)
-    return { ok: false, reason: `Image trop lourde (max ${MEDIA_LIMITS.maxInputBytes / 1024 / 1024} Mo).` };
+    return { ok: false, code: 'image.tooHeavy', params: { max: MEDIA_LIMITS.maxInputBytes / 1024 / 1024 } };
   const mime = sniffImageMime(bytes);
-  if (mime === 'image/heic')
-    return { ok: false, reason: 'Format HEIC non pris en charge ici : enregistre la photo en JPEG puis réessaie.' };
-  if (!mime) return { ok: false, reason: 'Format non pris en charge : JPEG, PNG ou WebP uniquement.' };
+  if (mime === 'image/heic') return { ok: false, code: 'image.heic' };
+  if (!mime) return { ok: false, code: 'image.unsupported' };
   return { ok: true, mime };
 }
 

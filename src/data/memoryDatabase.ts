@@ -14,6 +14,6 @@ export async function createMemoryDatabase(): Promise<Database> {
     run: async (sql: string, params?: SqlValue[]) => runSync(db, sql, params),
     all: async <T extends Row = Row>(sql: string, params?: SqlValue[]) => allSync(db, sql, params) as T[],
     transaction: async (statements: Statement[]) => transactionSync(db, statements),
-    info: async () => ({ sqliteVersion: sqlite3.version.libVersion, mode: 'memory', detail: 'Base en mémoire (tests)' }),
+    info: async () => ({ sqliteVersion: sqlite3.version.libVersion, mode: 'memory', detail: 'memory' }),
   };
 }

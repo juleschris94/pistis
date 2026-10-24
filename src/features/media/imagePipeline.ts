@@ -1,4 +1,5 @@
 import { checkImage, fitWithin, MEDIA_LIMITS, type ImageMime } from './mediaRules';
+import { PistisError } from '../../core/errors';
 
 export interface ProcessedImage {
   mime: ImageMime;
@@ -17,17 +18,16 @@ export interface ProcessedImage {
 export async function processImage(file: Blob): Promise<ProcessedImage> {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const check = checkImage(bytes);
-  if (!check.ok) throw new Error(check.reason);
+  if (!check.ok) throw new PistisError(check.code, check.params);
 
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(new Blob([bytes], { type: check.mime }), { imageOrientation: 'from-image' });
   } catch {
-    throw new Error('Image illisible ou endommagée. Essaie avec une autre photo.');
+    throw new PistisError('image.unreadable');
   }
   try {
-    if (bitmap.width * bitmap.height > MEDIA_LIMITS.maxPixels)
-      throw new Error('Image trop grande en pixels. Réduis-la avant de l’importer.');
+    if (bitmap.width * bitmap.height > MEDIA_LIMITS.maxPixels) throw new PistisError('image.tooManyPixels');
     // PNG garde la transparence ; JPEG et WebP sont ré-encodés en JPEG, le plus compatible.
     const outMime: ImageMime = check.mime === 'image/png' ? 'image/png' : 'image/jpeg';
     const main = fitWithin(bitmap.width, bitmap.height, MEDIA_LIMITS.maxSide);
@@ -45,7 +45,7 @@ async function encode(bitmap: ImageBitmap, width: number, height: number, mime: 
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Traitement d’image indisponible dans ce navigateur.');
+  if (!ctx) throw new PistisError('image.canvasUnavailable');
   if (mime === 'image/jpeg') {
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, width, height);
@@ -55,6 +55,6 @@ async function encode(bitmap: ImageBitmap, width: number, height: number, mime: 
   const blob = await new Promise<Blob | null>((resolve) =>
     canvas.toBlob(resolve, mime, mime === 'image/jpeg' ? MEDIA_LIMITS.jpegQuality : undefined),
   );
-  if (!blob) throw new Error("Impossible d'enregistrer l'image : mémoire insuffisante ?");
+  if (!blob) throw new PistisError('image.encodeFailed');
   return new Uint8Array(await blob.arrayBuffer());
 }

@@ -1,3 +1,4 @@
+import { PistisError } from '../../core/errors';
 import { newId, systemClock, type Clock } from '../../core/ids';
 import type { Database, Statement } from '../../data/database';
 import { deleteMediaIfUnusedStatement, prepareMediaInsert, type NewMedia } from '../media/mediaRepository';
@@ -32,17 +33,17 @@ export const PROFILE_LIMITS = { nickname: 30, name: 60, phrase: 140 };
 
 export type ProfileField = 'firstName' | 'lastName' | 'nickname' | 'phrase';
 
-/** Règles de validation, champ par champ, testées séparément de l'interface. */
-export function validateProfile(input: ProfileInput): Partial<Record<ProfileField, string>> {
-  const errors: Partial<Record<ProfileField, string>> = {};
-  const nick = input.nickname.trim();
-  if (nick.length < 1) errors.nickname = 'Le pseudo est obligatoire : il sert à te saluer.';
-  else if ([...nick].length > PROFILE_LIMITS.nickname) errors.nickname = `Le pseudo fait au plus ${PROFILE_LIMITS.nickname} caractères.`;
-  if ([...input.firstName.trim()].length > PROFILE_LIMITS.name)
-    errors.firstName = `Le prénom fait au plus ${PROFILE_LIMITS.name} caractères.`;
-  if ([...input.lastName.trim()].length > PROFILE_LIMITS.name) errors.lastName = `Le nom fait au plus ${PROFILE_LIMITS.name} caractères.`;
-  if ([...(input.phrase ?? '').trim()].length > PROFILE_LIMITS.phrase)
-    errors.phrase = `La phrase personnelle fait au plus ${PROFILE_LIMITS.phrase} caractères.`;
+export type ProfileFieldError = { code: 'required' } | { code: 'tooLong'; max: number };
+
+/** Règles de validation, champ par champ, testées séparément de l'interface. Renvoie des codes, pas des textes. */
+export function validateProfile(input: ProfileInput): Partial<Record<ProfileField, ProfileFieldError>> {
+  const errors: Partial<Record<ProfileField, ProfileFieldError>> = {};
+  const length = (v: string | undefined) => [...(v ?? '').trim()].length;
+  if (length(input.nickname) < 1) errors.nickname = { code: 'required' };
+  else if (length(input.nickname) > PROFILE_LIMITS.nickname) errors.nickname = { code: 'tooLong', max: PROFILE_LIMITS.nickname };
+  if (length(input.firstName) > PROFILE_LIMITS.name) errors.firstName = { code: 'tooLong', max: PROFILE_LIMITS.name };
+  if (length(input.lastName) > PROFILE_LIMITS.name) errors.lastName = { code: 'tooLong', max: PROFILE_LIMITS.name };
+  if (length(input.phrase) > PROFILE_LIMITS.phrase) errors.phrase = { code: 'tooLong', max: PROFILE_LIMITS.phrase };
   return errors;
 }
 
@@ -56,9 +57,16 @@ export async function getProfile(db: Database): Promise<Profile | null> {
  * Crée ou modifie le profil, photo comprise, en UNE transaction :
  * soit tout est enregistré (profil, nouvelle photo, suppression de l'ancienne), soit rien.
  */
-export async function saveProfile(db: Database, input: ProfileInput, photo?: PhotoChange, clock: Clock = systemClock): Promise<Profile> {
-  const errors = Object.values(validateProfile(input));
-  if (errors.length) throw new Error(errors.join(' '));
+export async function saveProfile(
+  db: Database,
+  input: ProfileInput,
+  photo?: PhotoChange,
+  clock: Clock = systemClock,
+  /** Écritures à faire dans la même transaction (ex. réglages choisis pendant l'accueil). */
+  extra: Statement[] = [],
+): Promise<Profile> {
+  const invalid = Object.keys(validateProfile(input));
+  if (invalid.length) throw new PistisError('profile.invalid', { detail: invalid.join(',') });
   const existing = await getProfile(db);
   const now = clock.now();
   const statements: Statement[] = [];
@@ -96,6 +104,6 @@ export async function saveProfile(db: Database, input: ProfileInput, photo?: Pho
   }
   if (previousAvatar && previousAvatar !== avatar) statements.push(deleteMediaIfUnusedStatement(previousAvatar));
 
-  await db.transaction(statements);
+  await db.transaction([...statements, ...extra]);
   return profile;
 }

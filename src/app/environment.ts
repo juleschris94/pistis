@@ -10,23 +10,11 @@ export interface Capabilities {
   hostname: string;
 }
 
-export type EnvironmentProblem = { title: string; detail: string };
+export type EnvironmentProblem = { code: 'insecure'; hostname: string } | { code: 'outdated' };
 
 export function checkEnvironment(c: Capabilities): EnvironmentProblem | null {
-  if (!c.secureContext) {
-    return {
-      title: 'Adresse non sécurisée',
-      detail:
-        `PISTIS a besoin d’une adresse sécurisée (https) pour stocker tes données et fonctionner hors ligne. ` +
-        `L’adresse actuelle (${c.hostname}) ne l’est pas. Ouvre la version en ligne en https, ou PISTIS sur « localhost » depuis ton ordinateur.`,
-    };
-  }
-  if (!c.worker || !c.webAssembly || !c.subtleCrypto) {
-    return {
-      title: 'Navigateur trop ancien',
-      detail: 'Ce navigateur ne propose pas les fonctions dont PISTIS a besoin. Mets à jour Chrome, Edge, Firefox ou Safari.',
-    };
-  }
+  if (!c.secureContext) return { code: 'insecure', hostname: c.hostname };
+  if (!c.worker || !c.webAssembly || !c.subtleCrypto) return { code: 'outdated' };
   return null;
 }
 

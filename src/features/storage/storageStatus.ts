@@ -20,11 +20,3 @@ export async function readStorageStatus(): Promise<BrowserStorageStatus> {
   const estimate = navigator.storage?.estimate ? await navigator.storage.estimate() : undefined;
   return { persisted, usageBytes: estimate?.usage ?? null, quotaBytes: estimate?.quota ?? null };
 }
-
-export function formatBytes(n: number | null): string {
-  if (n === null) return 'inconnu';
-  if (n < 1024) return `${n} o`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} Ko`;
-  if (n < 1024 ** 3) return `${(n / 1024 / 1024).toFixed(1)} Mo`;
-  return `${(n / 1024 ** 3).toFixed(1)} Go`;
-}

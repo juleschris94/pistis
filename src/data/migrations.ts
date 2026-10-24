@@ -1,3 +1,4 @@
+import { PistisError } from '../core/errors';
 import type { Database } from './database';
 
 /**
@@ -82,9 +83,7 @@ export async function getSchemaVersion(db: Database): Promise<number> {
 export async function migrate(db: Database): Promise<number[]> {
   const current = await getSchemaVersion(db);
   if (current > CURRENT_SCHEMA_VERSION) {
-    throw new Error(
-      `La base est en version ${current}, plus récente que cette version de PISTIS (${CURRENT_SCHEMA_VERSION}). Mets l'application à jour.`,
-    );
+    throw new PistisError('db.newerSchema', { current, supported: CURRENT_SCHEMA_VERSION });
   }
   const applied: number[] = [];
   for (const m of MIGRATIONS.filter((m) => m.version > current)) {

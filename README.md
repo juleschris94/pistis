@@ -5,9 +5,10 @@
 Application personnelle de pilotage de vie, 100 % locale : pas de compte, pas de cloud, pas de serveur.
 Elle fonctionne dans le navigateur (PC et Android), hors ligne après le premier chargement.
 
-> État actuel : **jalon M0 — spike technique** (version 0.0.2). L'écran affiché prouve que les fondations
-> tiennent sur ton appareil (base persistante, migrations, hors ligne, photo, sauvegarde). Il sera remplacé
-> par l'Accueil à partir du jalon M1.
+> État actuel : **jalon M1 — fondations** (version 0.1.0). Accueil en deux étapes, tableau de bord,
+> 5 onglets, profil et paramètres (domaines, thème clair/sombre, langue français/anglais, sauvegardes,
+> confidentialité et diagnostic). Les onglets Projets, Planning, Suivis et Finances annoncent honnêtement
+> leur jalon : ils se rempliront à partir de M2.
 
 ## Démarrer
 
@@ -49,8 +50,8 @@ en ligne. On passe de l'une à l'autre avec une sauvegarde `.pistis`.
 | `npm run typecheck` | Types TypeScript de tout le projet |
 | `npm run lint` | Erreurs courantes et règles React (ESLint) |
 | `npm run format` | Met le code en forme (Prettier) ; `format:check` vérifie sans modifier |
-| `npm test` | 37 tests : migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), contrôle du navigateur |
-| `npm run test:e2e` | 4 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : onboarding, photo sans EXIF, rechargement, hors ligne, sauvegarde chiffrée, restauration et annulation, onglets multiples. Échoue à la moindre erreur console ou requête externe. |
+| `npm test` | 54 tests : migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
+| `npm run test:e2e` | 6 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
 
 Première exécution des tests navigateur : `npx playwright install chromium`.
 
@@ -58,11 +59,14 @@ Première exécution des tests navigateur : `npx playwright install chromium`.
 
 ```
 src/
-  app/            démarrage, écrans, contrôle du navigateur, mises à jour
-  core/           outils communs (identifiants, horloge, empreintes)
+  app/            démarrage, routes, coque (onglets), thème, installation
+  content/        domaines, jalons, messages d'encouragement (modifiables)
+  core/           outils communs (erreurs, identifiants, horloge, semaine)
   data/           accès aux données : interface Database, pilotes, migrations
-  design-system/  jetons (couleurs, tailles) et composants réutilisables
-  features/       un dossier par module : profile, media, backup, storage…
+  design-system/  jetons (couleurs, tailles), composants, logo
+  features/       un dossier par module : onboarding, home, settings, profile,
+                  media, backup, notifications, modules (onglets à venir)
+  i18n/           textes français (référence) et anglais
 tests/            parcours navigateur (Playwright) et fichiers de test
 docs/             documentation vivante
 ```
@@ -73,6 +77,7 @@ Règle d'or : les écrans n'écrivent jamais de SQL et ne contiennent aucun calc
 
 - [docs/AGENTS.md](docs/AGENTS.md) — règles à respecter par toute personne ou IA qui modifie le code
 - [docs/m0-spike.md](docs/m0-spike.md) — ce que prouve le jalon M0 et ce qu'il te reste à vérifier
+- [docs/design-system.md](docs/design-system.md) — couleurs, typographie, composants, écarts avec le modèle
 - [docs/data-and-backup.md](docs/data-and-backup.md) — stockage, onglets, migrations, format `.pistis`
 - [docs/idees.md](docs/idees.md) — idées d'amélioration retenues et leur jalon
 - [CHANGELOG.md](CHANGELOG.md) — historique des versions

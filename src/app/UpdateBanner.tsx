@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { PButton } from '../design-system/components';
+import { useI18n } from '../i18n';
 
 /**
  * Mises à jour de PISTIS : la nouvelle version est téléchargée en arrière-plan, puis on DEMANDE
  * avant de l'activer. Un rechargement automatique pourrait faire perdre un formulaire en cours.
  */
-export function UpdateBanner() {
+export function UpdateBanner({ inApp }: { inApp: boolean }) {
+  const { t } = useI18n();
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     offlineReady: [offlineReady, setOfflineReady],
@@ -20,12 +22,13 @@ export function UpdateBanner() {
     return () => clearTimeout(timer);
   }, [offlineReady, needRefresh, setOfflineReady]);
 
-  if (!needRefresh && !offlineReady) return null;
+  // Pendant l'accueil, l'information « hors ligne » masquerait les boutons : seule une mise à jour est signalée.
+  if (!needRefresh && (!offlineReady || !inApp)) return null;
   return (
-    <div className="p-banner" role="status">
-      <p>{needRefresh ? 'Une nouvelle version de PISTIS est prête.' : 'PISTIS fonctionne maintenant sans Internet sur cet appareil.'}</p>
+    <div className={inApp ? 'p-banner p-banner--above-nav' : 'p-banner'} role="status">
+      <p>{needRefresh ? t('update.ready') : t('update.offlineReady')}</p>
       <div className="p-actions">
-        {needRefresh && <PButton onClick={() => void updateServiceWorker(true)}>Mettre à jour</PButton>}
+        {needRefresh && <PButton onClick={() => void updateServiceWorker(true)}>{t('update.apply')}</PButton>}
         <PButton
           variant="ghost"
           onClick={() => {
@@ -33,7 +36,7 @@ export function UpdateBanner() {
             setOfflineReady(false);
           }}
         >
-          {needRefresh ? 'Plus tard' : 'OK'}
+          {needRefresh ? t('update.later') : t('update.ok')}
         </PButton>
       </div>
     </div>

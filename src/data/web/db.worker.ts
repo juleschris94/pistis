@@ -55,7 +55,7 @@ const ready = (async () => {
 
   if (!opfsSupported()) {
     db = new sqlite3.oo1.DB(':memory:', 'c') as unknown as Oo1Like;
-    info = { sqliteVersion: version, mode: 'memory', detail: 'Stockage durable indisponible dans ce navigateur : données temporaires' };
+    info = { sqliteVersion: version, mode: 'memory', detail: 'memory' };
   } else {
     await acquireLock();
     // Juste après la fermeture d'un autre onglet, ses fichiers peuvent être libérés avec un léger décalage.
@@ -75,14 +75,14 @@ const ready = (async () => {
         await delay(250 * (attempt + 1));
       }
     }
-    if (lastError) throw new Error(`Impossible d'ouvrir le stockage de PISTIS : ${(lastError as Error).message}`);
-    info = { sqliteVersion: version, mode: 'persistent', detail: 'SQLite dans le stockage privé du navigateur (OPFS)' };
+    if (lastError) throw new Error((lastError as Error).message);
+    info = { sqliteVersion: version, mode: 'persistent', detail: 'opfs' };
   }
   runSync(db, 'PRAGMA foreign_keys = ON');
   post({ type: 'event', event: 'open' });
 })();
 
-ready.catch((error: Error) => post({ type: 'event', event: 'failed', error: error.message }));
+ready.catch((error: Error) => post({ type: 'event', event: 'failed', code: 'db.storageUnavailable', error: error.message }));
 
 self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
   const req = event.data;

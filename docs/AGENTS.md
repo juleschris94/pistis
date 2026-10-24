@@ -14,6 +14,8 @@ et à toute personne qui contribue.
 5. **Une migration publiée ne se modifie jamais.** On ajoute la suivante dans `src/data/migrations.ts`.
 6. **Ne jamais prétendre qu'une protection fonctionne** (chiffrement, sauvegarde) sans test qui le prouve.
 7. **Une écriture qui touche plusieurs lignes passe par `db.transaction`** : tout ou rien.
+8. **Aucun texte affiché écrit en dur.** Tout passe par `t('clé')` (src/i18n) ; la clé existe en français ET en anglais.
+   La logique lève des `PistisError('code')`, jamais un message en français.
 
 ## Architecture
 
@@ -23,6 +25,11 @@ et à toute personne qui contribue.
 - `src/design-system/` : toute couleur, taille, rayon vient de `tokens.css`. Pas de valeur en dur dans un écran.
   Texte sur un bouton principal : jetons `--action-bg` / `--action-text` (contraste vérifié), jamais le cyan de marque.
 - Textes, catégories, citations : à terme dans `src/content/` (JSON), jamais dispersés dans le code.
+
+## Liste de contrôle pour un nouveau texte ou une nouvelle erreur
+
+1. Clé ajoutée dans `src/i18n/fr.ts` puis `src/i18n/en.ts` (même variables `{…}`) : TypeScript et un test le vérifient.
+2. Nouvelle erreur : code ajouté à `ERROR_CODES` (`src/core/errors.ts`) et message `errors.<code>` dans les deux langues.
 
 ## Liste de contrôle pour une nouvelle table
 

@@ -29,5 +29,6 @@ export interface StorageInfo {
   sqliteVersion: string;
   /** `persistent` : fichier OPFS conservé ; `memory` : perdu à la fermeture. */
   mode: 'persistent' | 'memory';
+  /** Moteur de stockage technique (`opfs`, `memory`), affiché dans le diagnostic. */
   detail: string;
 }

@@ -17,13 +17,13 @@ const mediaCount = async (db: Awaited<ReturnType<typeof setup>>) => Number((awai
 
 describe('validation du profil', () => {
   it('exige un pseudo et indique le champ en faute', () => {
-    expect(validateProfile({ ...base, nickname: '  ' })).toEqual({ nickname: expect.stringContaining('obligatoire') });
+    expect(validateProfile({ ...base, nickname: '  ' })).toEqual({ nickname: { code: 'required' } });
     expect(validateProfile(base)).toEqual({});
   });
 
   it('compte les caractères, pas les unités internes (émojis)', () => {
     expect(validateProfile({ ...base, nickname: '😀'.repeat(30) })).toEqual({});
-    expect(validateProfile({ ...base, nickname: '😀'.repeat(31) }).nickname).toBeDefined();
+    expect(validateProfile({ ...base, nickname: '😀'.repeat(31) }).nickname).toEqual({ code: 'tooLong', max: 30 });
   });
 
   it('limite le prénom, le nom et la phrase', () => {
@@ -50,7 +50,10 @@ describe('enregistrement du profil', () => {
 
   it('refuse un profil invalide sans rien écrire', async () => {
     const db = await setup();
-    await expect(saveProfile(db, { ...base, nickname: '' }, jpeg(1))).rejects.toThrow(/obligatoire/);
+    await expect(saveProfile(db, { ...base, nickname: '' }, jpeg(1))).rejects.toMatchObject({
+      code: 'profile.invalid',
+      params: { detail: 'nickname' },
+    });
     expect(await getProfile(db)).toBeNull();
     expect(await mediaCount(db)).toBe(0);
   });

@@ -1,3 +1,4 @@
+import { Check, ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
 import {
   Component,
   useEffect,
@@ -5,28 +6,153 @@ import {
   useMemo,
   useRef,
   type ButtonHTMLAttributes,
+  type CSSProperties,
   type ErrorInfo,
   type InputHTMLAttributes,
   type ReactNode,
 } from 'react';
+import { Link } from 'react-router';
 
-/** Composants de base PISTIS. Les écrans les assemblent ; ils ne redéfinissent pas de styles. */
+/**
+ * Composants de base PISTIS. Les écrans les assemblent ; ils ne redéfinissent pas de styles.
+ * Aucun texte n'est écrit ici : les libellés arrivent déjà traduits par les écrans.
+ */
 
-export function PCard({ title, children, warm, id }: { title?: string; children: ReactNode; warm?: boolean; id?: string }) {
+/* ---- Cartes ---------------------------------------------------------------- */
+
+export function PCard({
+  title,
+  action,
+  children,
+  variant,
+  id,
+}: {
+  title?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  variant?: 'accent' | 'vision';
+  id?: string;
+}) {
   const headingId = useId();
   return (
-    <section className={warm ? 'p-card p-card--warm' : 'p-card'} aria-labelledby={title ? headingId : undefined} id={id}>
-      {title && <h2 id={headingId}>{title}</h2>}
+    <section className={variant ? `p-card p-card--${variant}` : 'p-card'} aria-labelledby={title ? headingId : undefined} id={id}>
+      {(title || action) && (
+        <div className="p-card__header">
+          {title && <h2 id={headingId}>{title}</h2>}
+          {action}
+        </div>
+      )}
       {children}
     </section>
   );
 }
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
-export function PButton({ variant = 'primary', ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant }) {
-  const cls = variant === 'primary' ? 'p-button' : `p-button p-button--${variant}`;
-  return <button type="button" className={cls} {...props} />;
+/* ---- Boutons --------------------------------------------------------------- */
+
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'light';
+const buttonClass = (variant: ButtonVariant, block?: boolean) =>
+  ['p-button', variant !== 'primary' && `p-button--${variant}`, block && 'p-button--block'].filter(Boolean).join(' ');
+
+export function PButton({
+  variant = 'primary',
+  block,
+  icon: Icon,
+  iconAfter: IconAfter,
+  children,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; block?: boolean; icon?: LucideIcon; iconAfter?: LucideIcon }) {
+  return (
+    <button type="button" className={buttonClass(variant, block)} {...props}>
+      {Icon && <Icon aria-hidden="true" />}
+      {children}
+      {IconAfter && <IconAfter aria-hidden="true" />}
+    </button>
+  );
 }
+
+export function PButtonLink({
+  to,
+  variant = 'primary',
+  block,
+  children,
+}: {
+  to: string;
+  variant?: ButtonVariant;
+  block?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Link to={to} className={buttonClass(variant, block)}>
+      {children}
+    </Link>
+  );
+}
+
+export function PIconButton({
+  icon: Icon,
+  label,
+  to,
+  onClick,
+  dot,
+  plain,
+}: {
+  icon: LucideIcon;
+  label: string;
+  to?: string;
+  onClick?: () => void;
+  dot?: boolean;
+  plain?: boolean;
+}) {
+  const cls = plain ? 'p-icon-button p-icon-button--plain' : 'p-icon-button';
+  const inner = (
+    <>
+      <Icon aria-hidden="true" />
+      {dot && <span className="p-dot" aria-hidden="true" />}
+    </>
+  );
+  return to ? (
+    <Link to={to} className={cls} aria-label={label}>
+      {inner}
+    </Link>
+  ) : (
+    <button type="button" className={cls} aria-label={label} onClick={onClick}>
+      {inner}
+    </button>
+  );
+}
+
+/* ---- En-tête d'écran ------------------------------------------------------- */
+
+/** Titre d'écran, avec retour facultatif et actions à droite. */
+export function PTopBar({
+  title,
+  subtitle,
+  back,
+  backLabel,
+  actions,
+  leading,
+}: {
+  title: ReactNode;
+  subtitle?: ReactNode;
+  back?: string;
+  backLabel?: string;
+  actions?: ReactNode;
+  leading?: ReactNode;
+}) {
+  return (
+    <header className="p-topbar">
+      {back && <PIconButton icon={ChevronLeft} label={backLabel ?? ''} to={back} plain />}
+      {leading}
+      <div className="p-topbar__title">
+        <h1 className="p-title">{title}</h1>
+        {subtitle && <p className="p-subtle">{subtitle}</p>}
+      </div>
+      {actions}
+    </header>
+  );
+}
+
+/* ---- Formulaires ----------------------------------------------------------- */
 
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string; error?: string; id: string };
 
@@ -59,8 +185,8 @@ export function PField({ label, hint, error, id, ...input }: FieldProps) {
 }
 
 /**
- * Bouton de choix de fichier aux couleurs de PISTIS (le bouton natif du navigateur change de langue
- * et d'apparence selon l'appareil). Le même fichier peut être choisi deux fois de suite.
+ * Bouton de choix de fichier aux couleurs de PISTIS (le bouton natif change de langue et d'apparence
+ * selon l'appareil). Le même fichier peut être choisi deux fois de suite.
  */
 export function PFileButton({
   label,
@@ -68,17 +194,19 @@ export function PFileButton({
   onFile,
   variant = 'secondary',
   id,
+  icon,
 }: {
   label: string;
   accept: string;
   onFile: (file: File) => void;
   variant?: ButtonVariant;
   id?: string;
+  icon?: LucideIcon;
 }) {
   const input = useRef<HTMLInputElement>(null);
   return (
     <>
-      <PButton variant={variant} onClick={() => input.current?.click()} id={id}>
+      <PButton variant={variant} onClick={() => input.current?.click()} id={id} icon={icon}>
         {label}
       </PButton>
       <input
@@ -96,6 +224,31 @@ export function PFileButton({
     </>
   );
 }
+
+/** Choix exclusif (Clair / Système / Sombre…), navigable au clavier comme des boutons radio. */
+export function PSegmented<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div className="p-segmented" role="radiogroup" aria-label={label}>
+      {options.map((o) => (
+        <button key={o.value} type="button" role="radio" aria-checked={o.value === value} onClick={() => onChange(o.value)}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---- Avatar ---------------------------------------------------------------- */
 
 export function PAvatar({
   image,
@@ -132,10 +285,173 @@ export function PAvatar({
   );
 }
 
+/* ---- Tuiles et icônes ------------------------------------------------------ */
+
+/** Tuile colorée sélectionnable (catégories). `color` = une variable de couleur, ex. `var(--cat-finance)`. */
+export function PTile({
+  icon: Icon,
+  label,
+  color,
+  selected,
+  onToggle,
+}: {
+  icon: LucideIcon;
+  label: string;
+  color: string;
+  selected: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button type="button" className="p-tile" style={{ '--tile': color } as CSSProperties} aria-pressed={selected} onClick={onToggle}>
+      {selected && (
+        <span className="p-tile__check" aria-hidden="true">
+          <Check strokeWidth={3} />
+        </span>
+      )}
+      <Icon aria-hidden="true" strokeWidth={1.8} />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+export function PIconBox({ icon: Icon, color, soft }: { icon: LucideIcon; color?: string; soft?: boolean }) {
+  return (
+    <span
+      className={soft ? 'p-icon-box p-icon-box--soft' : 'p-icon-box'}
+      style={color ? ({ '--tile': color } as CSSProperties) : undefined}
+      aria-hidden="true"
+    >
+      <Icon />
+    </span>
+  );
+}
+
+export function PBadge({ tone, children }: { tone?: 'brand' | 'positive' | 'attention' | 'vision'; children: ReactNode }) {
+  return <span className={tone ? `p-badge p-badge--${tone}` : 'p-badge'}>{children}</span>;
+}
+
+/* ---- Listes ---------------------------------------------------------------- */
+
+export function PList({ label, children }: { label?: string; children: ReactNode }) {
+  return (
+    <ul className="p-list" aria-label={label}>
+      {children}
+    </ul>
+  );
+}
+
+/** Ligne de liste : lien (`to`), bouton (`onClick`) ou simple information. */
+export function PListRow({
+  icon,
+  color,
+  title,
+  subtitle,
+  to,
+  onClick,
+  trailing,
+}: {
+  icon?: LucideIcon;
+  color?: string;
+  title: string;
+  subtitle?: ReactNode;
+  to?: string;
+  onClick?: () => void;
+  trailing?: ReactNode;
+}) {
+  const content = (
+    <>
+      {icon && <PIconBox icon={icon} color={color} soft />}
+      <span className="p-list__text">
+        <span className="p-list__title">{title}</span>
+        {subtitle && <span className="p-list__subtitle">{subtitle}</span>}
+      </span>
+      {trailing}
+      {(to || onClick) && <ChevronRight className="p-list__chevron" aria-hidden="true" />}
+    </>
+  );
+  return (
+    <li>
+      {to ? (
+        <Link to={to} className="p-list__row">
+          {content}
+        </Link>
+      ) : onClick ? (
+        <button type="button" className="p-list__row" onClick={onClick}>
+          {content}
+        </button>
+      ) : (
+        <div className="p-list__row" aria-disabled="true">
+          {content}
+        </div>
+      )}
+    </li>
+  );
+}
+
+/* ---- Progression ----------------------------------------------------------- */
+
+/** Anneau de progression (0 à 1). Le libellé lisible est fourni par l'écran. */
+export function PRing({ value, size = 104, label, valueText }: { value: number; size?: number; label: string; valueText: string }) {
+  const gradientId = useId();
+  const stroke = 10;
+  const r = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(1, value));
+  return (
+    <div className="p-ring" style={{ width: size, height: size }} role="img" aria-label={label}>
+      <svg width={size} height={size} aria-hidden="true">
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#00d1ff" />
+            <stop offset="100%" stopColor="#2563eb" />
+          </linearGradient>
+        </defs>
+        <circle className="p-ring__track" cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={`url(#${gradientId})`}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - clamped)}
+          style={{ transition: 'stroke-dashoffset 600ms var(--ease)' }}
+        />
+      </svg>
+      <span className="p-ring__label" aria-hidden="true">
+        {valueText}
+      </span>
+    </div>
+  );
+}
+
+export function PBar({ value, label }: { value: number; label: string }) {
+  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
+  return (
+    <div className="p-bar" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+      <div className="p-bar__value" style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+/** Barre d'étapes en haut d'un parcours (ex. accueil en 3 étapes). */
+export function PSteps({ current, total, label }: { current: number; total: number; label: string }) {
+  return (
+    <div className="p-steps" role="progressbar" aria-label={label} aria-valuemin={1} aria-valuemax={total} aria-valuenow={current}>
+      {Array.from({ length: total }, (_, i) => (
+        <span key={i} data-done={i < current} />
+      ))}
+    </div>
+  );
+}
+
+/* ---- Contrôles, messages, états -------------------------------------------- */
+
 export type CheckState = 'ok' | 'warn' | 'wait';
-export function PCheck({ state, title, detail }: { state: CheckState; title: string; detail: string }) {
-  const symbol = state === 'ok' ? '✓' : state === 'warn' ? '!' : '…';
-  const label = state === 'ok' ? 'Validé' : state === 'warn' ? 'À vérifier' : 'En attente';
+export function PCheck({ state, title, detail, stateLabel }: { state: CheckState; title: string; detail: ReactNode; stateLabel: string }) {
+  const symbol = state === 'ok' ? <Check strokeWidth={3} /> : state === 'warn' ? '!' : '…';
   return (
     <li className="p-check">
       <span className={`p-check__dot p-check__dot--${state}`} aria-hidden="true">
@@ -144,7 +460,7 @@ export function PCheck({ state, title, detail }: { state: CheckState; title: str
       <div>
         <p className="p-check__title">
           {title}
-          <span className="p-visually-hidden"> : {label}</span>
+          <span className="p-visually-hidden"> : {stateLabel}</span>
         </p>
         <p className="p-subtle">{detail}</p>
       </div>
@@ -160,19 +476,37 @@ export function PMessage({ tone, children }: { tone: 'ok' | 'error' | 'info' | '
   );
 }
 
+export function PEmpty({ icon: Icon, title, children }: { icon: LucideIcon; title: string; children?: ReactNode }) {
+  return (
+    <div className="p-empty">
+      <span className="p-empty__icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <h2 className="p-heading">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
 /** Écran plein, centré : chargement, problème bloquant, autre onglet. */
 export function PScreen({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <main className="p-welcome">
+    <main className="p-screen-center">
       <p className="p-logo">PISTIS</p>
-      <h1 className="p-greeting">{title}</h1>
+      <h1 className="p-title">{title}</h1>
       {children}
     </main>
   );
 }
 
-/** Dernier filet de sécurité : une erreur imprévue affiche un écran clair au lieu d'une page blanche. */
-export class PErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+/**
+ * Dernier filet de sécurité : une erreur imprévue affiche un écran clair au lieu d'une page blanche.
+ * Les textes sont fournis par l'appelant (ce composant ne peut pas utiliser les traductions par hook).
+ */
+export class PErrorBoundary extends Component<
+  { children: ReactNode; texts: { title: string; body: string; reload: string } },
+  { error: Error | null }
+> {
   state = { error: null as Error | null };
 
   static getDerivedStateFromError(error: Error) {
@@ -185,12 +519,13 @@ export class PErrorBoundary extends Component<{ children: ReactNode }, { error: 
 
   render() {
     if (!this.state.error) return this.props.children;
+    const { texts } = this.props;
     return (
-      <PScreen title="Un problème inattendu est survenu">
-        <p className="p-subtle">Tes données ne sont pas touchées : elles restent enregistrées sur cet appareil.</p>
+      <PScreen title={texts.title}>
+        <p className="p-subtle">{texts.body}</p>
         <PMessage tone="error">{this.state.error.message}</PMessage>
         <div>
-          <PButton onClick={() => location.reload()}>Recharger PISTIS</PButton>
+          <PButton onClick={() => location.reload()}>{texts.reload}</PButton>
         </div>
       </PScreen>
     );

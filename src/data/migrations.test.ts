@@ -29,7 +29,7 @@ describe('migrations', () => {
   it('refuse une base plus récente que l’application', async () => {
     const db = await createMemoryDatabase();
     await db.run(`PRAGMA user_version = ${CURRENT_SCHEMA_VERSION + 1}`);
-    await expect(migrate(db)).rejects.toThrow(/plus récente/);
+    await expect(migrate(db)).rejects.toMatchObject({ code: 'db.newerSchema' });
   });
 
   it('annule entièrement une transaction en échec', async () => {

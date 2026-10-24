@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 export const fixture = (name: string) => path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', name);
 
 /**
- * Surveille la page : toute erreur console, toute violation de la politique de sécurité
- * et toute requête vers un autre site fait échouer le test (promesse « 100 % local »).
+ * Surveille la page : toute erreur console, toute exception et toute requête vers un autre site
+ * fait échouer le test (promesse « 100 % local »).
  */
 export function watchPage(page: Page) {
   const problems: string[] = [];
@@ -31,9 +31,12 @@ export async function useDownloadsForBackups(context: BrowserContext) {
   });
 }
 
-export async function createProfile(page: Page, nickname: string, opts: { photo?: string; firstName?: string } = {}) {
+/** Parcours d'accueil complet : bienvenue → besoins → profil. */
+export async function createProfile(page: Page, nickname: string, opts: { photo?: string; firstName?: string; hide?: string[] } = {}) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer' }).click();
+  for (const name of opts.hide ?? []) await page.getByRole('button', { name, exact: true }).click();
+  await page.getByRole('button', { name: 'Suivant' }).click();
   if (opts.firstName) await page.getByLabel('Prénom').fill(opts.firstName);
   await page.getByLabel('Pseudo').fill(nickname);
   if (opts.photo) {
@@ -41,5 +44,8 @@ export async function createProfile(page: Page, nickname: string, opts: { photo?
     await expect(page.getByText('métadonnées supprimées')).toBeVisible();
   }
   await page.getByRole('button', { name: 'Créer mon espace' }).click();
-  await expect(page.getByRole('heading', { name: `Bienvenue, ${nickname} ! 👋` })).toBeVisible();
+  await expect(page.getByRole('heading', { name: `Bonjour ${nickname} ! 👋` })).toBeVisible();
 }
+
+/** Les 5 onglets existent en double sur la page d'accueil (liens « Ton espace ») : on vise la barre de navigation. */
+export const nav = (page: Page, name: string) => page.getByRole('navigation').getByRole('link', { name, exact: true });

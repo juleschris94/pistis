@@ -14,12 +14,12 @@ describe('règles des images', () => {
   });
 
   it('refuse HEIC, les formats inconnus, les fichiers vides ou trop lourds', () => {
-    expect(checkImage(bytes(0, 0, 0, 0x18, ...ascii('ftypheic')))).toMatchObject({ ok: false });
-    expect(checkImage(bytes(...ascii('%PDF-1.7')))).toMatchObject({ ok: false });
-    expect(checkImage(new Uint8Array())).toMatchObject({ ok: false });
+    expect(checkImage(bytes(0, 0, 0, 0x18, ...ascii('ftypheic')))).toEqual({ ok: false, code: 'image.heic' });
+    expect(checkImage(bytes(...ascii('%PDF-1.7')))).toEqual({ ok: false, code: 'image.unsupported' });
+    expect(checkImage(new Uint8Array())).toEqual({ ok: false, code: 'image.empty' });
     const huge = new Uint8Array(MEDIA_LIMITS.maxInputBytes + 1);
     huge.set([0xff, 0xd8, 0xff]);
-    expect(checkImage(huge)).toMatchObject({ ok: false });
+    expect(checkImage(huge)).toEqual({ ok: false, code: 'image.tooHeavy', params: { max: 10 } });
   });
 
   it('réduit sans déformer et sans agrandir', () => {

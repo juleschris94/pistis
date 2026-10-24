@@ -1,3 +1,4 @@
+import { PistisError } from '../../core/errors';
 import type { Database, Row, SqlValue, Statement, StorageInfo } from '../database';
 import { TAB_CHANNEL_NAME, type WorkerMessage, type WorkerRequest } from './protocol';
 
@@ -11,7 +12,7 @@ export type ConnectionState =
   | { kind: 'waiting-other-tab' }
   | { kind: 'open' }
   | { kind: 'yielded' } // un autre onglet a repris la main
-  | { kind: 'failed'; error: string };
+  | { kind: 'failed'; error: PistisError };
 
 export interface WebDatabase extends Database {
   /** Demande à l'onglet qui détient la base de la céder à celui-ci. */
@@ -44,7 +45,7 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
         isOpen = true;
         onState({ kind: 'open' });
       } else if (msg.event === 'waiting-lock') onState({ kind: 'waiting-other-tab' });
-      else onState({ kind: 'failed', error: msg.error ?? 'Erreur inconnue' });
+      else onState({ kind: 'failed', error: new PistisError(msg.code ?? 'db.storageUnavailable', { detail: msg.error ?? '' }) });
       return;
     }
     const p = pending.get(msg.id);
@@ -56,11 +57,11 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
 
   worker.onerror = (event) => {
     event.preventDefault();
-    const error = new Error(`Le moteur de données n'a pas pu démarrer${event.message ? ` (${event.message})` : ''}.`);
+    const error = new PistisError('db.workerFailed', { detail: event.message ?? '' });
     failAll(error);
-    onState({ kind: 'failed', error: error.message });
+    onState({ kind: 'failed', error });
   };
-  worker.onmessageerror = () => failAll(new Error('Message illisible entre l’interface et la base.'));
+  worker.onmessageerror = () => failAll(new PistisError('db.workerFailed', { detail: 'messageerror' }));
 
   // Un nouvel onglet demande la main : on arrête notre travailleur, ce qui libère la base et le verrou.
   if (channel) {
@@ -68,7 +69,7 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
       if (event.data?.type !== 'takeover' || !isOpen) return;
       worker.terminate();
       isOpen = false;
-      failAll(new Error('PISTIS est maintenant ouvert dans un autre onglet.'));
+      failAll(new PistisError('db.otherTab'));
       onState({ kind: 'yielded' });
     };
   }

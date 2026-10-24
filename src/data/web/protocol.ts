@@ -1,3 +1,4 @@
+import type { ErrorCode } from '../../core/errors';
 import type { Row, SqlValue, Statement, StorageInfo } from '../database';
 
 /** Messages échangés entre l'interface et le travailleur SQLite. */
@@ -26,6 +27,7 @@ export interface WorkerResponse {
 export interface WorkerEvent {
   type: 'event';
   event: 'waiting-lock' | 'open' | 'failed';
+  code?: ErrorCode;
   error?: string;
 }
 

@@ -1,25 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { RouterProvider } from 'react-router';
 import type { Database } from '../data/database';
 import type { ConnectionState } from '../data/web/webDatabase';
 import { PButton, PMessage, PScreen } from '../design-system/components';
 import { getMedia } from '../features/media/mediaRepository';
+import { Onboarding } from '../features/onboarding/Onboarding';
 import { getProfile, type Profile } from '../features/profile/profile';
+import { detectLanguage, getSettings, type Settings } from '../features/settings/settings';
 import { requestPersistence } from '../features/storage/storageStatus';
+import { I18nProvider, useI18n } from '../i18n';
+import { AppContext, type AppData } from './AppContext';
+import { router } from './routes';
 import { getDatabase, subscribeConnection, takeOverFromOtherTab } from './services';
-import { TestBench } from './TestBench';
-import { Welcome } from './Welcome';
+import { applyReducedMotion, applyThemePreference } from './theme';
+import { UpdateBanner } from './UpdateBanner';
 
 const sessionStart = Date.now();
+const browserLanguage = detectLanguage(typeof navigator === 'undefined' ? [] : navigator.languages);
 
-type Loaded = { db: Database; profile: Profile | null; avatar: Uint8Array | null; avatarMime: string };
+interface Loaded {
+  db: Database;
+  profile: Profile | null;
+  avatar: Uint8Array | null;
+  avatarMime: string;
+  settings: Settings;
+}
 
 async function loadData(): Promise<Loaded> {
   const db = await getDatabase();
-  const profile = await getProfile(db);
+  const [profile, settings] = await Promise.all([getProfile(db), getSettings(db, browserLanguage)]);
   const media = profile?.avatar_media_id ? await getMedia(db, profile.avatar_media_id) : null;
   return {
     db,
     profile,
+    settings,
     avatar: media?.thumb ?? media?.data ?? null,
     avatarMime: media?.thumb ? 'image/jpeg' : (media?.mime ?? 'image/jpeg'),
   };
@@ -28,11 +42,9 @@ async function loadData(): Promise<Loaded> {
 export function App() {
   const [connection, setConnection] = useState<ConnectionState>({ kind: 'opening' });
   const [data, setData] = useState<Loaded | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
+  const [loadError, setLoadError] = useState<unknown>(null);
   // Incrémenté après chaque modification des données : déclenche un nouveau chargement.
   const [version, setVersion] = useState(0);
-  const reload = () => setVersion((v) => v + 1);
 
   useEffect(() => subscribeConnection(setConnection), []);
   useEffect(() => {
@@ -43,67 +55,104 @@ export function App() {
     loadData().then(
       (loaded) => {
         if (!alive) return;
+        applyThemePreference(loaded.settings.theme);
+        applyReducedMotion(loaded.settings.reducedMotion);
         setData(loaded);
         setLoadError(null);
       },
-      (e: Error) => alive && setLoadError(e.message),
+      (e: unknown) => alive && setLoadError(e),
     );
     return () => {
       alive = false;
     };
   }, [version]);
 
+  const language = data?.settings.language ?? browserLanguage;
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
+
+  const appData = useMemo<AppData | null>(
+    () =>
+      data?.profile
+        ? {
+            db: data.db,
+            profile: data.profile,
+            avatar: data.avatar,
+            avatarMime: data.avatarMime,
+            settings: data.settings,
+            sessionStart,
+            reload: () => setVersion((v) => v + 1),
+          }
+        : null,
+    [data],
+  );
+
+  return (
+    <I18nProvider language={language}>
+      <UpdateBanner inApp={appData !== null} />
+      <Content connection={connection} data={data} appData={appData} loadError={loadError} reload={() => setVersion((v) => v + 1)} />
+    </I18nProvider>
+  );
+}
+
+function Content({
+  connection,
+  data,
+  appData,
+  loadError,
+  reload,
+}: {
+  connection: ConnectionState;
+  data: Loaded | null;
+  appData: AppData | null;
+  loadError: unknown;
+  reload: () => void;
+}) {
+  const { t, formatError } = useI18n();
+
   if (connection.kind === 'yielded') {
     return (
-      <PScreen title="PISTIS est ouvert dans un autre onglet">
-        <p className="p-subtle">Pour protéger tes données, PISTIS ne s’utilise que dans un seul onglet à la fois.</p>
+      <PScreen title={t('tabs.yielded.title')}>
+        <p className="p-subtle">{t('tabs.yielded.body')}</p>
         <div>
-          <PButton onClick={() => location.reload()}>Utiliser ici</PButton>
+          <PButton onClick={() => location.reload()}>{t('tabs.yielded.action')}</PButton>
         </div>
       </PScreen>
     );
   }
   if (connection.kind === 'waiting-other-tab' && !data) {
     return (
-      <PScreen title="PISTIS est déjà ouvert ailleurs">
-        <p className="p-subtle">
-          Un autre onglet ou une autre fenêtre utilise tes données. Ferme-le, ou continue ici : l’autre onglet se mettra en pause.
-        </p>
+      <PScreen title={t('tabs.waiting.title')}>
+        <p className="p-subtle">{t('tabs.waiting.body')}</p>
         <div>
-          <PButton onClick={takeOverFromOtherTab}>Continuer ici</PButton>
+          <PButton onClick={takeOverFromOtherTab}>{t('tabs.waiting.action')}</PButton>
         </div>
       </PScreen>
     );
   }
   if (connection.kind === 'failed' || loadError) {
     return (
-      <PScreen title="Impossible d’ouvrir tes données">
-        <PMessage tone="error">{connection.kind === 'failed' ? connection.error : loadError}</PMessage>
-        <p className="p-subtle">
-          Tes données ne sont pas effacées. Recharge la page ; si le problème persiste, ferme les autres onglets de PISTIS.
-        </p>
+      <PScreen title={t('startup.failed.title')}>
+        <PMessage tone="error">{formatError(connection.kind === 'failed' ? connection.error : loadError)}</PMessage>
+        <p className="p-subtle">{t('startup.failed.body')}</p>
         <div>
-          <PButton onClick={() => location.reload()}>Réessayer</PButton>
+          <PButton onClick={() => location.reload()}>{t('common.retry')}</PButton>
         </div>
       </PScreen>
     );
   }
   if (!data) {
     return (
-      <PScreen title="Ouverture de ton espace…">
+      <PScreen title={t('startup.opening')}>
         <div className="p-spinner" aria-hidden="true" />
       </PScreen>
     );
   }
-  if (!data.profile) return <Welcome db={data.db} onDone={reload} />;
+  if (!appData) return <Onboarding db={data.db} initialSettings={data.settings} onDone={reload} />;
   return (
-    <TestBench
-      db={data.db}
-      profile={data.profile}
-      avatar={data.avatar}
-      avatarMime={data.avatarMime}
-      sessionStart={sessionStart}
-      onDataChanged={reload}
-    />
+    <AppContext.Provider value={appData}>
+      <RouterProvider router={router} />
+    </AppContext.Provider>
   );
 }

@@ -1,4 +1,5 @@
 import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
+import { PistisError } from '../../core/errors';
 import { sha256Hex } from '../../core/hash';
 import { newId, systemClock, type Clock } from '../../core/ids';
 import type { Database, Row, SqlValue, Statement } from '../../data/database';
@@ -57,8 +58,6 @@ export interface ExportOptions {
   iterations?: number;
 }
 
-export class BackupError extends Error {}
-
 /** Produit le fichier de sauvegarde, sans rien écrire dans la base. */
 export async function exportBackup(db: Database, opts: ExportOptions): Promise<{ bytes: Uint8Array; manifest: BackupManifest }> {
   const clock = opts.clock ?? systemClock;
@@ -103,10 +102,10 @@ export async function exportBackup(db: Database, opts: ExportOptions): Promise<{
 
 /** Lit et valide entièrement une sauvegarde, sans rien écrire. */
 export async function readBackup(file: Uint8Array, password?: string, iterations = PBKDF2_ITERATIONS): Promise<ParsedBackup> {
-  if (file.length === 0) throw new BackupError('Le fichier est vide.');
-  if (file.length > BACKUP_LIMITS.maxFileBytes) throw new BackupError('Fichier trop volumineux pour une sauvegarde PISTIS.');
+  if (file.length === 0) throw new PistisError('backup.empty');
+  if (file.length > BACKUP_LIMITS.maxFileBytes) throw new PistisError('backup.tooLarge');
   const encrypted = isEncrypted(file);
-  if (encrypted && !password) throw new BackupError('Cette sauvegarde est chiffrée : saisis son mot de passe.');
+  if (encrypted && !password) throw new PistisError('backup.needsPassword');
   const zipBytes = encrypted ? await decryptBytes(file, password as string, iterations) : file;
 
   let entries: Record<string, Uint8Array>;
@@ -115,53 +114,52 @@ export async function readBackup(file: Uint8Array, password?: string, iterations
     let count = 0;
     entries = unzipSync(zipBytes, {
       filter: (f) => {
-        if (!ALLOWED_PATH.test(f.name)) throw new BackupError(`Fichier inattendu : ${f.name}`);
+        if (!ALLOWED_PATH.test(f.name)) throw new PistisError('backup.unexpectedFile', { detail: f.name });
         total += f.originalSize;
         count += 1;
-        if (total > BACKUP_LIMITS.maxUncompressedBytes || count > BACKUP_LIMITS.maxEntries)
-          throw new BackupError('Sauvegarde démesurée : ouverture refusée par sécurité.');
+        if (total > BACKUP_LIMITS.maxUncompressedBytes || count > BACKUP_LIMITS.maxEntries) throw new PistisError('backup.oversized');
         return true;
       },
     });
   } catch (error) {
-    if (error instanceof BackupError) throw error;
-    throw new BackupError("Ce fichier n'est pas une sauvegarde PISTIS lisible.");
+    if (error instanceof PistisError) throw error;
+    throw new PistisError('backup.unreadable');
   }
 
-  const manifest = validateManifest(parseJson<unknown>(entries['manifest.json'], 'manifeste'));
+  const manifest = validateManifest(parseJson<unknown>(entries['manifest.json'], 'manifest.json'));
 
   // Chaque fichier listé doit exister avec la bonne empreinte ; aucun fichier non listé n'est accepté.
   for (const [path, expected] of Object.entries(manifest.files)) {
     const content = entries[path];
-    if (!content) throw new BackupError(`Fichier manquant dans la sauvegarde : ${path}`);
-    if ((await sha256Hex(content)) !== expected) throw new BackupError(`Fichier altéré dans la sauvegarde : ${path}`);
+    if (!content) throw new PistisError('backup.missingFile', { detail: path });
+    if ((await sha256Hex(content)) !== expected) throw new PistisError('backup.alteredFile', { detail: path });
   }
   for (const path of Object.keys(entries)) {
-    if (path !== 'manifest.json' && !Object.hasOwn(manifest.files, path)) throw new BackupError(`Fichier inattendu : ${path}`);
+    if (path !== 'manifest.json' && !Object.hasOwn(manifest.files, path)) throw new PistisError('backup.unexpectedFile', { detail: path });
   }
 
-  const raw = parseJson<unknown>(entries['data.json'], 'données');
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new BackupError('Sauvegarde endommagée : données mal formées.');
+  const raw = parseJson<unknown>(entries['data.json'], 'data.json');
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new PistisError('backup.damaged', { detail: 'data.json' });
   const tables = raw as TableDump;
 
   const blobs: ParsedBackup['blobs'] = {};
   for (const [table, rows] of Object.entries(tables)) {
-    if (!(BACKUP_TABLES as readonly string[]).includes(table)) throw new BackupError(`Table inconnue : ${table}`);
-    if (!Array.isArray(rows)) throw new BackupError(`Table mal formée : ${table}`);
-    if (rows.length !== manifest.counts[table]) throw new BackupError(`Nombre de lignes incohérent pour ${table}.`);
+    if (!(BACKUP_TABLES as readonly string[]).includes(table)) throw new PistisError('backup.unknownTable', { detail: table });
+    if (!Array.isArray(rows)) throw new PistisError('backup.damaged', { detail: table });
+    if (rows.length !== manifest.counts[table]) throw new PistisError('backup.countMismatch', { detail: table });
     for (const row of rows) validateRow(table, row);
     for (const col of BLOB_COLUMNS[table] ?? []) {
       for (const row of rows) {
         const id = String(row.id);
         const content = entries[`media/${id}/${col}`];
         if (content) ((blobs[table] ??= {})[id] ??= {})[col] = content;
-        else if (col === 'data') throw new BackupError(`Image manquante pour le média ${id}.`);
+        else if (col === 'data') throw new PistisError('backup.missingImage', { detail: id });
       }
     }
   }
 
   upgradeTables(tables, manifest.schemaVersion);
-  for (const table of BACKUP_TABLES) if (!Array.isArray(tables[table])) throw new BackupError(`Table absente de la sauvegarde : ${table}`);
+  for (const table of BACKUP_TABLES) if (!Array.isArray(tables[table])) throw new PistisError('backup.missingTable', { detail: table });
   return { manifest, tables, blobs, encrypted };
 }
 
@@ -183,7 +181,7 @@ export async function restoreBackup(db: Database, backup: ParsedBackup, clock: C
       const full: Row = { ...row, ...(backup.blobs[table]?.[String(row.id)] ?? {}) };
       const cols = Object.keys(full);
       const unknown = cols.filter((c) => !known.has(c));
-      if (unknown.length) throw new BackupError(`Colonnes inconnues dans ${table} : ${unknown.join(', ')}`);
+      if (unknown.length) throw new PistisError('backup.unknownColumns', { detail: `${table}: ${unknown.join(', ')}` });
       statements.push({
         sql: `INSERT INTO ${table} (${cols.join(', ')}) VALUES (${cols.map(() => '?').join(', ')})`,
         params: cols.map((c) => full[c] as SqlValue),
@@ -246,38 +244,35 @@ export function backupFileName(date = new Date(), prefix = 'pistis-sauvegarde'):
 
 function validateManifest(value: unknown): BackupManifest {
   const m = value as Partial<BackupManifest> | null;
-  if (!m || typeof m !== 'object') throw new BackupError('Sauvegarde endommagée : manifeste illisible.');
-  if (m.format !== BACKUP_FORMAT) throw new BackupError("Ce fichier n'est pas une sauvegarde PISTIS.");
-  if (m.formatVersion !== BACKUP_FORMAT_VERSION)
-    throw new BackupError(`Format de sauvegarde ${String(m.formatVersion)} non pris en charge.`);
-  if (!Number.isInteger(m.schemaVersion) || (m.schemaVersion as number) < 1)
-    throw new BackupError('Version de schéma invalide dans la sauvegarde.');
-  if ((m.schemaVersion as number) > CURRENT_SCHEMA_VERSION)
-    throw new BackupError('Cette sauvegarde vient d’une version plus récente de PISTIS : mets l’application à jour.');
-  if (typeof m.createdAt !== 'string' || Number.isNaN(Date.parse(m.createdAt))) throw new BackupError('Date de sauvegarde invalide.');
+  if (!m || typeof m !== 'object') throw new PistisError('backup.damaged', { detail: 'manifest.json' });
+  if (m.format !== BACKUP_FORMAT) throw new PistisError('backup.notPistis');
+  if (m.formatVersion !== BACKUP_FORMAT_VERSION) throw new PistisError('backup.unsupportedFormat', { detail: String(m.formatVersion) });
+  if (!Number.isInteger(m.schemaVersion) || (m.schemaVersion as number) < 1) throw new PistisError('backup.invalidSchema');
+  if ((m.schemaVersion as number) > CURRENT_SCHEMA_VERSION) throw new PistisError('backup.newerVersion');
+  if (typeof m.createdAt !== 'string' || Number.isNaN(Date.parse(m.createdAt))) throw new PistisError('backup.invalidDate');
   const isRecord = (v: unknown) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
-  if (!isRecord(m.counts) || !isRecord(m.files)) throw new BackupError('Sauvegarde endommagée : manifeste incomplet.');
-  if (!Object.hasOwn(m.files as object, 'data.json')) throw new BackupError('Sauvegarde incomplète : données absentes.');
+  if (!isRecord(m.counts) || !isRecord(m.files)) throw new PistisError('backup.incompleteManifest');
+  if (!Object.hasOwn(m.files as object, 'data.json')) throw new PistisError('backup.incompleteManifest', { detail: 'data.json' });
   return m as BackupManifest;
 }
 
 function validateRow(table: string, row: unknown): asserts row is Row {
-  if (!row || typeof row !== 'object' || Array.isArray(row)) throw new BackupError(`Ligne mal formée dans ${table}.`);
+  if (!row || typeof row !== 'object' || Array.isArray(row)) throw new PistisError('backup.invalidRow', { detail: table });
   for (const [key, value] of Object.entries(row)) {
-    if (!/^[a-z_][a-z0-9_]*$/.test(key)) throw new BackupError(`Nom de colonne invalide dans ${table} : ${key}`);
+    if (!/^[a-z_][a-z0-9_]*$/.test(key)) throw new PistisError('backup.invalidRow', { detail: `${table}.${key}` });
     if (value !== null && typeof value !== 'string' && typeof value !== 'number')
-      throw new BackupError(`Valeur invalide dans ${table}.${key}`);
+      throw new PistisError('backup.invalidRow', { detail: `${table}.${key}` });
   }
   const id = (row as Row)[PRIMARY_KEYS[table] ?? 'id'];
-  if (typeof id !== 'string' || id.length === 0) throw new BackupError(`Identifiant manquant dans ${table}.`);
-  if (BLOB_COLUMNS[table] && !/^[0-9a-f-]{36}$/.test(id)) throw new BackupError(`Identifiant d'image invalide : ${id}`);
+  if (typeof id !== 'string' || id.length === 0) throw new PistisError('backup.invalidRow', { detail: `${table}: id` });
+  if (BLOB_COLUMNS[table] && !/^[0-9a-f-]{36}$/.test(id)) throw new PistisError('backup.invalidRow', { detail: `media: ${id}` });
 }
 
 function parseJson<T>(bytes: Uint8Array | undefined, label: string): T {
-  if (!bytes) throw new BackupError(`Sauvegarde incomplète : ${label} absentes.`);
+  if (!bytes) throw new PistisError('backup.missingFile', { detail: label });
   try {
     return JSON.parse(strFromU8(bytes)) as T;
   } catch {
-    throw new BackupError(`Sauvegarde endommagée : ${label} illisibles.`);
+    throw new PistisError('backup.damaged', { detail: label });
   }
 }

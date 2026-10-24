@@ -9,12 +9,13 @@ describe('contrôle du navigateur', () => {
   });
 
   it('explique le problème d’une adresse http sur le réseau local', () => {
-    const problem = checkEnvironment({ ...ok, secureContext: false, hostname: '192.168.1.20' });
-    expect(problem?.title).toBe('Adresse non sécurisée');
-    expect(problem?.detail).toContain('192.168.1.20');
+    expect(checkEnvironment({ ...ok, secureContext: false, hostname: '192.168.1.20' })).toEqual({
+      code: 'insecure',
+      hostname: '192.168.1.20',
+    });
   });
 
   it('signale un navigateur trop ancien', () => {
-    expect(checkEnvironment({ ...ok, webAssembly: false })?.title).toBe('Navigateur trop ancien');
+    expect(checkEnvironment({ ...ok, webAssembly: false })).toEqual({ code: 'outdated' });
   });
 });

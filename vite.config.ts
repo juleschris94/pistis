@@ -59,8 +59,8 @@ export default defineConfig({
         scope: '.',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#EAF7FC',
-        theme_color: '#32AEDC',
+        background_color: '#0F172A',
+        theme_color: '#0F172A',
         categories: ['productivity', 'lifestyle', 'finance'],
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
@@ -70,9 +70,16 @@ export default defineConfig({
       },
       workbox: {
         // Tout ce qui est nécessaire au fonctionnement hors ligne, y compris le moteur SQLite (.wasm).
-        globPatterns: ['**/*.{js,css,html,wasm,png,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,wasm,png,svg,webmanifest,woff2}'],
         // Fichiers du paquet SQLite que PISTIS n'utilise pas (autres modes de stockage) : inutile de les télécharger.
-        globIgnores: ['**/sqlite3-worker1-*.js', '**/sqlite3-opfs-async-proxy-*.js'],
+        globIgnores: [
+          '**/sqlite3-worker1-*.js',
+          '**/sqlite3-opfs-async-proxy-*.js',
+          // Alphabets non utilisés par le français et l'anglais : chargés seulement si besoin.
+          '**/inter-cyrillic*.woff2',
+          '**/inter-greek*.woff2',
+          '**/inter-vietnamese*.woff2',
+        ],
         maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
