@@ -70,6 +70,60 @@ export const MIGRATIONS: Migration[] = [
       ];
     },
   },
+  {
+    version: 3,
+    description: 'Projets et objectifs (Pourquoi, vision), étapes et tâches',
+    statements: [
+      `CREATE TABLE goal (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 120),
+        description TEXT NOT NULL DEFAULT '',
+        why TEXT NOT NULL DEFAULT '',
+        category TEXT NOT NULL,
+        status TEXT NOT NULL CHECK (status IN ('idea', 'active', 'paused', 'done', 'archived')),
+        priority INTEGER NOT NULL DEFAULT 2 CHECK (priority BETWEEN 1 AND 3),
+        target_date TEXT CHECK (target_date IS NULL OR target_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
+        vision_text TEXT NOT NULL DEFAULT '',
+        vision_art TEXT,
+        vision_media_id TEXT REFERENCES media(id) ON DELETE SET NULL,
+        template_id TEXT,
+        template_version INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        completed_at INTEGER,
+        CHECK (status = 'idea' OR length(trim(why)) > 0)
+      )`,
+      `CREATE TABLE milestone (
+        id TEXT PRIMARY KEY,
+        goal_id TEXT NOT NULL REFERENCES goal(id) ON DELETE CASCADE,
+        title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 120),
+        position INTEGER NOT NULL,
+        created_at INTEGER NOT NULL
+      )`,
+      `CREATE TABLE task (
+        id TEXT PRIMARY KEY,
+        goal_id TEXT REFERENCES goal(id) ON DELETE CASCADE,
+        milestone_id TEXT REFERENCES milestone(id) ON DELETE SET NULL,
+        title TEXT NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 160),
+        priority INTEGER NOT NULL DEFAULT 2 CHECK (priority BETWEEN 1 AND 3),
+        due_date TEXT CHECK (due_date IS NULL OR due_date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
+        estimate_minutes INTEGER CHECK (estimate_minutes IS NULL OR estimate_minutes > 0),
+        pinned_on TEXT,
+        position INTEGER NOT NULL,
+        done_at INTEGER,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      )`,
+      'CREATE INDEX idx_milestone_goal ON milestone(goal_id, position)',
+      'CREATE INDEX idx_task_goal ON task(goal_id, position)',
+      'CREATE INDEX idx_task_open ON task(done_at, due_date)',
+    ],
+    upgradeBackup: (tables) => {
+      tables.goal ??= [];
+      tables.milestone ??= [];
+      tables.task ??= [];
+    },
+  },
 ];
 
 export const CURRENT_SCHEMA_VERSION = MIGRATIONS[MIGRATIONS.length - 1].version;
@@ -94,7 +148,7 @@ export async function migrate(db: Database): Promise<number[]> {
 }
 
 /** Tables incluses dans les sauvegardes, dans un ordre compatible avec les clés étrangères. */
-export const BACKUP_TABLES = ['media', 'profile', 'settings', 'backup_log'] as const;
+export const BACKUP_TABLES = ['media', 'profile', 'settings', 'backup_log', 'goal', 'milestone', 'task'] as const;
 /** Clé primaire de chaque table sauvegardée (« id » par défaut). */
 export const PRIMARY_KEYS: Record<string, string> = { settings: 'key' };
 /** Colonnes binaires sorties du JSON et rangées comme fichiers dans l'archive. */

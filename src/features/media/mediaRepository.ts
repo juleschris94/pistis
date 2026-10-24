@@ -29,7 +29,10 @@ export interface NewMedia {
  * Chaque nouveau module qui utilise des images (projets, objectifs, biens…) s'ajoute ici :
  * c'est ce qui empêche de supprimer une image encore utilisée ailleurs.
  */
-export const MEDIA_REFERENCES: { table: string; column: string }[] = [{ table: 'profile', column: 'avatar_media_id' }];
+export const MEDIA_REFERENCES: { table: string; column: string }[] = [
+  { table: 'profile', column: 'avatar_media_id' },
+  { table: 'goal', column: 'vision_media_id' },
+];
 
 /**
  * Prépare l'enregistrement d'une image déjà optimisée, sans rien écrire.

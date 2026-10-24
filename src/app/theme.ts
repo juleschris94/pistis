@@ -6,7 +6,7 @@ import type { ThemePreference } from '../features/settings/settings';
  * l'ouverture de la base (évite un flash de couleur). La base reste la référence.
  */
 const STORAGE_KEY = 'pistis-theme';
-const THEME_COLORS = { dark: '#0f172a', light: '#f1f5f9' } as const;
+const THEME_COLORS = { dark: '#07121f', light: '#f5f8fc' } as const;
 
 export function resolveTheme(preference: ThemePreference, systemPrefersDark: boolean): 'dark' | 'light' {
   if (preference === 'system') return systemPrefersDark ? 'dark' : 'light';

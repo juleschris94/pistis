@@ -1,4 +1,4 @@
-import { Check, ChevronLeft, ChevronRight, type LucideIcon } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, X, type LucideIcon } from 'lucide-react';
 import {
   Component,
   useEffect,
@@ -10,7 +10,10 @@ import {
   type ErrorInfo,
   type InputHTMLAttributes,
   type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router';
 
 /**
@@ -402,8 +405,8 @@ export function PRing({ value, size = 104, label, valueText }: { value: number; 
       <svg width={size} height={size} aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#00d1ff" />
-            <stop offset="100%" stopColor="#2563eb" />
+            <stop offset="0%" stopColor="#2e8bff" />
+            <stop offset="100%" stopColor="#00c7ff" />
           </linearGradient>
         </defs>
         <circle className="p-ring__track" cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} />
@@ -450,7 +453,20 @@ export function PSteps({ current, total, label }: { current: number; total: numb
 /* ---- Contrôles, messages, états -------------------------------------------- */
 
 export type CheckState = 'ok' | 'warn' | 'wait';
-export function PCheck({ state, title, detail, stateLabel }: { state: CheckState; title: string; detail: ReactNode; stateLabel: string }) {
+export function PCheck({
+  state,
+  title,
+  detail,
+  stateLabel,
+  action,
+}: {
+  state: CheckState;
+  title: string;
+  detail: ReactNode;
+  stateLabel: string;
+  /** Bouton ou lien facultatif sous le texte (ex. « Sauvegarder maintenant »). */
+  action?: ReactNode;
+}) {
   const symbol = state === 'ok' ? <Check strokeWidth={3} /> : state === 'warn' ? '!' : '…';
   return (
     <li className="p-check">
@@ -463,6 +479,7 @@ export function PCheck({ state, title, detail, stateLabel }: { state: CheckState
           <span className="p-visually-hidden"> : {stateLabel}</span>
         </p>
         <p className="p-subtle">{detail}</p>
+        {action && <div className="p-check__action">{action}</div>}
       </div>
     </li>
   );
@@ -530,4 +547,133 @@ export class PErrorBoundary extends Component<
       </PScreen>
     );
   }
+}
+
+/* ---- Saisie longue, listes déroulantes, puces --------------------------------- */
+
+type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; hint?: string; error?: string; id: string };
+
+export function PTextArea({ label, hint, error, id, ...area }: TextAreaProps) {
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+  return (
+    <div className="p-field">
+      <label htmlFor={id}>{label}</label>
+      <textarea
+        id={id}
+        className={error ? 'p-input p-input--invalid' : 'p-input'}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={[errorId, hintId].filter(Boolean).join(' ') || undefined}
+        {...area}
+      />
+      {error && (
+        <span className="p-field__error" id={errorId}>
+          {error}
+        </span>
+      )}
+      {hint && (
+        <span className="p-hint" id={hintId}>
+          {hint}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function PSelect({
+  label,
+  id,
+  options,
+  ...select
+}: SelectHTMLAttributes<HTMLSelectElement> & { label: string; id: string; options: { value: string; label: string }[] }) {
+  return (
+    <div className="p-field">
+      <label htmlFor={id}>{label}</label>
+      <select id={id} className="p-input" {...select}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export function PChip({
+  selected,
+  icon: Icon,
+  children,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { selected?: boolean; icon?: LucideIcon }) {
+  return (
+    <button type="button" className="p-chip" aria-pressed={selected === undefined ? undefined : selected} {...props}>
+      {Icon && <Icon aria-hidden="true" />}
+      {children}
+    </button>
+  );
+}
+
+/* ---- Feuille modale ----------------------------------------------------------- */
+
+/**
+ * Feuille qui monte du bas (téléphone) ou fenêtre centrée (ordinateur).
+ * Accessible : rôle dialog, focus placé dans la feuille puis rendu à l'élément d'origine, Échap ferme.
+ */
+export function PSheet({
+  title,
+  closeLabel,
+  onClose,
+  children,
+}: {
+  title: string;
+  closeLabel: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const close = useRef(onClose);
+  useEffect(() => {
+    close.current = onClose;
+  }, [onClose]);
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    ref.current?.querySelector<HTMLElement>('input, textarea, select, button:not(.p-sheet__close), a[href]')?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close.current();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      previous?.focus?.();
+    };
+  }, []);
+  return createPortal(
+    <div
+      className="p-sheet-backdrop"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) close.current();
+      }}
+    >
+      <div className="p-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} ref={ref}>
+        <span className="p-sheet__handle" aria-hidden="true" />
+        <div className="p-section-title">
+          <h2 className="p-heading" id={titleId}>
+            {title}
+          </h2>
+          <button
+            type="button"
+            className="p-icon-button p-icon-button--plain p-sheet__close"
+            aria-label={closeLabel}
+            onClick={() => close.current()}
+          >
+            <X aria-hidden="true" />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>,
+    document.body,
+  );
 }

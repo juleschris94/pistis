@@ -1,5 +1,31 @@
 # Historique des versions
 
+## 0.2.0-m2 — 25 octobre 2026
+
+Jalon M2 : projets et priorités du jour, palette officielle, version d'essai.
+
+### Ajouté
+
+- Onglet Projets : projets en cours, idées et projets terminés, avec bannière illustrée, Pourquoi, avancement réel
+  et prochaine action.
+- Dix modèles de projets (créer son entreprise, projet professionnel, lire un livre, sport, budget, épargne,
+  voiture, déménagement, logement, démarches) : objectif, exemples de Pourquoi, résultat visé, plan modifiable.
+- Assistant en 4 étapes : objectif → Pourquoi (obligatoire) → vision imaginée (illustration ou photo) → plan.
+- Fiche projet : étapes et tâches à cocher, ajouter, renommer, supprimer ; statut, archivage, suppression confirmée.
+- Idées notées en quelques secondes, transformées plus tard en projet sans rien perdre.
+- Priorités du jour sur l'accueil : trois au maximum, épingles de l'utilisateur toujours en tête, raison affichée.
+- Bouton « + » sur tous les écrans : tâche rapide (avec ou sans projet), idée, projet.
+- Base : migration v3 (tables `goal`, `milestone`, `task`), incluses dans les sauvegardes.
+- Version d'essai en un seul fichier (`npm run build:demo`).
+- Documentation : règles métier (`docs/business-rules.md`), feuille de route (`docs/roadmap.md`).
+
+### Modifié
+
+- Palette officielle : bleu nuit `#07121F`, bleu `#2E8BFF`, cyan `#00C7FF`, violet `#865CFF`, accent champagne ;
+  logo P avec étoile champagne ; icônes régénérées. Contrastes vérifiés (docs/design-system.md).
+- Erreurs de l'assistant affichées sous le champ concerné, qui reçoit le focus.
+- 84 tests unitaires et 16 parcours navigateur.
+
 ## 0.1.0-m1 — 25 octobre 2026
 
 Jalon M1 : fondations de l'application, nouvelle identité visuelle « bleu nuit et cyan ».

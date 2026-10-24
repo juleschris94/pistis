@@ -42,6 +42,12 @@ export const ERROR_CODES = [
   'db.workerFailed',
   'db.otherTab',
   'profile.invalid',
+  'goal.invalid',
+  'goal.notFound',
+  'goal.whyRequired',
+  'task.invalid',
+  'task.tooManyPinned',
+  'milestone.invalid',
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

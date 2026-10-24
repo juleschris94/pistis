@@ -59,8 +59,8 @@ export default defineConfig({
         scope: '.',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#0F172A',
-        theme_color: '#0F172A',
+        background_color: '#07121F',
+        theme_color: '#07121F',
         categories: ['productivity', 'lifestyle', 'finance'],
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },

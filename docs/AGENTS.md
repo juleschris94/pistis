@@ -19,12 +19,19 @@ et à toute personne qui contribue.
 
 ## Architecture
 
-- `src/domain/` (à partir du jalon M2) et les fichiers `*Rules.ts` : fonctions pures, sans React ni base de données, testées à 100 %.
+- `src/domain/` et les fichiers `*Rules.ts` : fonctions pures, sans React ni base de données, testées à 100 %.
 - `src/data/` : seul endroit où l'on parle à SQLite. Les écrans passent par des fonctions de dépôt
   (`getProfile`, `saveProfile`…).
 - `src/design-system/` : toute couleur, taille, rayon vient de `tokens.css`. Pas de valeur en dur dans un écran.
   Texte sur un bouton principal : jetons `--action-bg` / `--action-text` (contraste vérifié), jamais le cyan de marque.
 - Textes, catégories, citations : à terme dans `src/content/` (JSON), jamais dispersés dans le code.
+
+## Version d'essai
+
+`vite.demo.config.ts` remplace le pilote de base (`src/data/web/webDatabase`) par `src/demo/demoDatabase.ts`
+(sql.js en JavaScript pur) et désactive service worker et CSP, **pour la version d'essai seulement**.
+Ne jamais importer `src/demo/` depuis l'application ; le code propre à l'essai est protégé par
+`import.meta.env.MODE === 'demo'` et disparaît de la version réelle.
 
 ## Liste de contrôle pour un nouveau texte ou une nouvelle erreur
 

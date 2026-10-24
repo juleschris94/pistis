@@ -1,5 +1,11 @@
-import { createHashRouter, Navigate } from 'react-router';
+import { createHashRouter, createMemoryRouter, Navigate, type RouteObject } from 'react-router';
 import { HomeScreen } from '../features/home/HomeScreen';
+import { GoalEditScreen } from '../features/projects/GoalEditScreen';
+import { GoalWizard } from '../features/projects/GoalWizard';
+import { NewProjectScreen } from '../features/projects/NewProjectScreen';
+import { ProjectDetailScreen } from '../features/projects/ProjectDetailScreen';
+import { ProjectsScreen } from '../features/projects/ProjectsScreen';
+import { TemplateScreen, TemplatesScreen } from '../features/projects/TemplatesScreen';
 import { ModuleScreen } from '../features/modules/ModuleScreen';
 import { NotificationsScreen } from '../features/notifications/NotificationsScreen';
 import { AppearanceScreen } from '../features/settings/AppearanceScreen';
@@ -12,12 +18,18 @@ import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { AppShell } from './AppShell';
 import { ROUTES } from './paths';
 
-export const router = createHashRouter([
+const routes: RouteObject[] = [
   {
     element: <AppShell />,
     children: [
       { path: ROUTES.home, element: <HomeScreen /> },
-      { path: ROUTES.projects, element: <ModuleScreen module="projects" /> },
+      { path: ROUTES.projects, element: <ProjectsScreen /> },
+      { path: ROUTES.projectNew, element: <NewProjectScreen /> },
+      { path: ROUTES.templates, element: <TemplatesScreen /> },
+      { path: ROUTES.template, element: <TemplateScreen /> },
+      { path: ROUTES.wizard, element: <GoalWizard /> },
+      { path: ROUTES.project, element: <ProjectDetailScreen /> },
+      { path: ROUTES.projectEdit, element: <GoalEditScreen /> },
       { path: ROUTES.planning, element: <ModuleScreen module="planning" /> },
       { path: ROUTES.tracking, element: <ModuleScreen module="tracking" /> },
       { path: ROUTES.finance, element: <ModuleScreen module="finance" /> },
@@ -32,4 +44,7 @@ export const router = createHashRouter([
       { path: '*', element: <Navigate to={ROUTES.home} replace /> },
     ],
   },
-]);
+];
+
+// La version d'essai tourne dans une page intégrée dont l'adresse ne peut pas changer : routeur en mémoire.
+export const router = import.meta.env.MODE === 'demo' ? createMemoryRouter(routes) : createHashRouter(routes);

@@ -1,13 +1,14 @@
-import { CalendarDays, FolderKanban, Home, ListChecks, Wallet, type LucideIcon } from 'lucide-react';
+import { CalendarDays, Home, ListChecks, Target, Wallet, type LucideIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
 import { LogoMark } from '../design-system/Logo';
+import { QuickAdd } from '../features/projects/QuickAdd';
 import { useI18n, type MessageKey } from '../i18n';
 import { ROUTES } from './paths';
 
 const TABS: { to: string; icon: LucideIcon; label: MessageKey }[] = [
   { to: ROUTES.home, icon: Home, label: 'nav.home' },
-  { to: ROUTES.projects, icon: FolderKanban, label: 'nav.projects' },
+  { to: ROUTES.projects, icon: Target, label: 'nav.projects' },
   { to: ROUTES.planning, icon: CalendarDays, label: 'nav.planning' },
   { to: ROUTES.tracking, icon: ListChecks, label: 'nav.tracking' },
   { to: ROUTES.finance, icon: Wallet, label: 'nav.finance' },
@@ -40,6 +41,7 @@ export function AppShell() {
           </NavLink>
         ))}
       </nav>
+      <QuickAdd />
     </div>
   );
 }

@@ -20,7 +20,7 @@ describe('migrations', () => {
     const db = await createMemoryDatabase();
     await db.transaction([...MIGRATIONS[0].statements.map((sql) => ({ sql })), { sql: 'PRAGMA user_version = 1' }]);
     await db.run("INSERT INTO profile (id, nickname, created_at, updated_at) VALUES ('p1', 'JC', 1, 1)");
-    expect(await migrate(db)).toEqual([2]);
+    expect(await migrate(db)).toEqual([2, 3]);
     const rows = await db.all('SELECT nickname FROM profile');
     expect(rows).toEqual([{ nickname: 'JC' }]);
     expect(await db.all("SELECT value FROM settings WHERE key = 'currency'")).toEqual([{ value: 'EUR' }]);

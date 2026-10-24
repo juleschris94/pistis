@@ -20,9 +20,17 @@ npm run dev          # version de développement : http://localhost:5173
 npm run build        # version finale dans le dossier dist/
 npm run preview      # sert la version finale : http://localhost:4173
 npm run check        # TOUTES les vérifications (voir « Qualité » ci-dessous)
+npm run build:demo   # version d'essai en un seul fichier : dist-demo/index.html
 ```
 
 Le mode hors ligne et la politique de sécurité ne sont actifs que dans la version finale (`build` puis `preview`).
+
+## Version d'essai
+
+`npm run build:demo` produit un fichier HTML unique qui s'ouvre partout, même intégré dans une autre page :
+SQLite y tourne en JavaScript pur, les données sont gardées dans le navigateur (IndexedDB), un bandeau
+« Version d'essai » permet de tout effacer. L'export de sauvegarde et l'installation n'y sont pas disponibles.
+L'application réelle n'est pas concernée (`vite.demo.config.ts` ne sert qu'à cette version).
 
 ## Utiliser PISTIS sur ton téléphone
 
@@ -50,8 +58,8 @@ en ligne. On passe de l'une à l'autre avec une sauvegarde `.pistis`.
 | `npm run typecheck` | Types TypeScript de tout le projet |
 | `npm run lint` | Erreurs courantes et règles React (ESLint) |
 | `npm run format` | Met le code en forme (Prettier) ; `format:check` vérifie sans modifier |
-| `npm test` | 54 tests : migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
-| `npm run test:e2e` | 6 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
+| `npm test` | 84 tests : projets, étapes et tâches, progression, priorités du jour, modèles, migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
+| `npm run test:e2e` | 8 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : modèle → assistant → projet, tâches et priorités du jour, ajout rapide et idée → projet, accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
 
 Première exécution des tests navigateur : `npx playwright install chromium`.
 
@@ -60,12 +68,14 @@ Première exécution des tests navigateur : `npx playwright install chromium`.
 ```
 src/
   app/            démarrage, routes, coque (onglets), thème, installation
-  content/        domaines, jalons, messages d'encouragement (modifiables)
+  content/        domaines, modèles de projets, illustrations, jalons, encouragements
+  demo/           pilote et bandeau de la version d'essai (jamais dans l'application réelle)
+  domain/         règles métier pures : projets, progression, priorités du jour
   core/           outils communs (erreurs, identifiants, horloge, semaine)
   data/           accès aux données : interface Database, pilotes, migrations
   design-system/  jetons (couleurs, tailles), composants, logo
   features/       un dossier par module : onboarding, home, settings, profile,
-                  media, backup, notifications, modules (onglets à venir)
+                  projects, media, backup, notifications, modules (onglets à venir)
   i18n/           textes français (référence) et anglais
 tests/            parcours navigateur (Playwright) et fichiers de test
 docs/             documentation vivante
@@ -79,6 +89,8 @@ Règle d'or : les écrans n'écrivent jamais de SQL et ne contiennent aucun calc
 - [docs/m0-spike.md](docs/m0-spike.md) — ce que prouve le jalon M0 et ce qu'il te reste à vérifier
 - [docs/design-system.md](docs/design-system.md) — couleurs, typographie, composants, écarts avec le modèle
 - [docs/data-and-backup.md](docs/data-and-backup.md) — stockage, onglets, migrations, format `.pistis`
+- [docs/business-rules.md](docs/business-rules.md) — règles métier (Pourquoi, progression, priorités du jour)
+- [docs/roadmap.md](docs/roadmap.md) — jalons et prochaines étapes
 - [docs/idees.md](docs/idees.md) — idées d'amélioration retenues et leur jalon
 - [CHANGELOG.md](CHANGELOG.md) — historique des versions
 - Document d'architecture complet : « PISTIS V1 — Audit et architecture » (référence produit)

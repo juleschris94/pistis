@@ -12,90 +12,102 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Surfaces */
-  --surface-background: #0f172a;
-  --surface-card: #1e293b;
-  --surface-raised: #334155;
-  --surface-sunken: #0b1222;
-  --surface-overlay: rgba(15, 23, 42, 0.92);
-  --border-subtle: rgba(148, 163, 184, 0.16);
-  --border-strong: rgba(148, 163, 184, 0.32);
+  /* Surfaces — palette officielle PISTIS (prompt de recréation, §6) */
+  --surface-background: #07121f;
+  --surface-sunken: #0b1b2e;
+  --surface-card: #10243b;
+  --surface-raised: #172f49;
+  --surface-overlay: rgba(7, 18, 31, 0.92);
+  --border-subtle: #1c3550;
+  --border-strong: #28425e;
 
   /* Texte */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-primary: #f7fafc;
+  --text-secondary: #9eb0c5;
+  --text-muted: #70849c; /* légendes sur le fond uniquement (4,9:1) */
 
   /* Marque */
-  --brand-primary: #00d1ff; /* cyan : progression réelle, éléments actifs */
-  --brand-text: #00d1ff; /* cyan utilisé comme texte (liens) */
-  --brand-soft: rgba(0, 209, 255, 0.14);
-  --brand-secondary: #7c3aed; /* violet : projections, vision */
-  --brand-secondary-text: #a78bfa;
-  --brand-gradient: linear-gradient(135deg, #00d1ff 0%, #2563eb 100%);
+  --brand-primary: #00c7ff; /* cyan : mise en évidence, progression réelle */
+  --brand-blue: #2e8bff; /* bleu électrique : actions */
+  --brand-text: #5aa3ff; /* bleu lisible comme texte de lien (6:1) */
+  --brand-soft: rgba(46, 139, 255, 0.16);
+  --brand-secondary: #865cff; /* violet : projets, vision */
+  --brand-secondary-text: #a68bff;
+  --brand-champagne: #ffd08a;
+  --brand-gradient: linear-gradient(135deg, #2e8bff 0%, #00c7ff 100%);
+  --project-gradient: linear-gradient(135deg, #865cff 0%, #2e8bff 100%);
+  --success-gradient: linear-gradient(135deg, #10bfa5 0%, #00c7ff 100%);
 
-  /* Action principale : cyan vif + texte bleu nuit (9,8:1) */
-  --action-bg: #00d1ff;
-  --action-text: #0f172a;
+  /* Action principale : dégradé bleu électrique → cyan + texte bleu nuit (5,6:1 à 9,5:1) */
+  --action-bg: linear-gradient(135deg, #2e8bff 0%, #00c7ff 100%);
+  --action-solid: #2e8bff;
+  --action-text: #07121f;
 
-  /* États (jamais de rouge pour un objectif en retard : le rouge = erreur ou action destructrice) */
-  --status-positive: #10b981;
-  --status-positive-soft: rgba(16, 185, 129, 0.16);
-  --status-attention: #f59e0b;
-  --status-attention-soft: rgba(245, 158, 11, 0.16);
-  --status-alert: #f87171;
-  --status-alert-soft: rgba(239, 68, 68, 0.16);
+  /* États (le corail = erreurs et actions destructrices, jamais un objectif en retard) */
+  --status-positive: #10bfa5;
+  --status-positive-soft: rgba(16, 191, 165, 0.16);
+  --status-attention: #ffb547;
+  --status-attention-soft: rgba(255, 181, 71, 0.16);
+  --status-alert: #ff5964;
+  --status-alert-soft: rgba(255, 89, 100, 0.16);
 
-  /* Catégories : fonds profonds pour un texte blanc lisible (≥ 5:1) */
-  --cat-projects: #2563eb;
-  --cat-finance: #047857;
-  --cat-habits: #0f766e;
-  --cat-admin: #7c3aed;
-  --cat-housing: #c2410c;
-  --cat-family: #be123c;
+  /* Domaines : fonds profonds pour un texte blanc lisible (≥ 4,6:1) */
+  --cat-projects: #1f6feb;
+  --cat-finance: #0b7a69;
+  --cat-habits: #00799e;
+  --cat-admin: #6d45e0;
+  --cat-housing: #a85a00;
+  --cat-family: #c42b3a;
 
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px rgba(2, 6, 23, 0.35);
-  --shadow-floating: 0 16px 40px rgba(2, 6, 23, 0.55);
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px rgba(0, 4, 12, 0.35);
+  --shadow-floating: 0 16px 40px rgba(0, 4, 12, 0.55);
 }
 
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --surface-background: #f1f5f9;
+  --surface-background: #f5f8fc;
+  --surface-sunken: #edf3f9;
   --surface-card: #ffffff;
-  --surface-raised: #e2e8f0;
-  --surface-sunken: #f8fafc;
-  --surface-overlay: rgba(241, 245, 249, 0.92);
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-strong: rgba(15, 23, 42, 0.18);
+  --surface-raised: #e6eef7;
+  --surface-overlay: rgba(245, 248, 252, 0.94);
+  --border-subtle: #dce5f0;
+  --border-strong: #c3d1e2;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
+  --text-primary: #132236;
+  --text-secondary: #607389;
+  --text-muted: #607389;
 
-  --brand-primary: #00b4e0;
-  --brand-text: #0369a1;
-  --brand-soft: rgba(0, 180, 224, 0.14);
-  --brand-secondary: #7c3aed;
-  --brand-secondary-text: #6d28d9;
+  --brand-primary: #009ec9;
+  --brand-blue: #1769e8;
+  --brand-text: #1769e8;
+  --brand-soft: rgba(23, 105, 232, 0.1);
+  --brand-secondary: #6d45e0;
+  --brand-secondary-text: #6d45e0;
+  --brand-champagne: #b26a00;
 
-  --action-bg: #00d1ff;
-  --action-text: #0f172a;
+  --action-bg: linear-gradient(135deg, #1769e8 0%, #1f6feb 100%);
+  --action-solid: #1769e8;
+  --action-text: #ffffff;
 
-  --status-positive: #047857;
-  --status-positive-soft: rgba(4, 120, 87, 0.12);
-  --status-attention: #b45309;
-  --status-attention-soft: rgba(180, 83, 9, 0.12);
-  --status-alert: #b91c1c;
-  --status-alert-soft: rgba(185, 28, 28, 0.1);
+  --status-positive: #0a7563;
+  --status-positive-soft: rgba(10, 117, 99, 0.12);
+  --status-attention: #965a00;
+  --status-attention-soft: rgba(150, 90, 0, 0.12);
+  --status-alert: #c42b3a;
+  --status-alert-soft: rgba(196, 43, 58, 0.1);
 
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --shadow-floating: 0 16px 40px rgba(15, 23, 42, 0.16);
+  --shadow-card: 0 1px 2px rgba(19, 34, 54, 0.04), 0 8px 24px rgba(19, 34, 54, 0.06);
+  --shadow-floating: 0 16px 40px rgba(19, 34, 54, 0.16);
 }
 
 :root {
   /* Typographie : Inter, embarquée dans l'application (aucun téléchargement externe) */
   --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --text-display: 34px; /* Titre 1 · Bold */
-  --text-title: 24px; /* Titre 2 · SemiBold */
+  --text-display: 36px; /* Display · Bold */
+  --text-h1: 30px; /* H1 · Bold */
+  --text-title: 24px; /* H2 · SemiBold */
+  --text-card-title: 17px; /* Titre de carte · SemiBold */
   --text-heading: 20px; /* Titre 3 · SemiBold */
   --text-body: 16px; /* Corps */
   --text-small: 14px; /* Petit texte */

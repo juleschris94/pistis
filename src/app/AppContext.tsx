@@ -12,6 +12,8 @@ export interface AppData {
   settings: Settings;
   /** Recharge le profil et les réglages après une modification. */
   reload: () => void;
+  /** Augmente à chaque rechargement : les écrans s'en servent pour relire leurs données. */
+  version: number;
   /** Moment d'ouverture de l'application (pour savoir si le profil a survécu à un redémarrage). */
   sessionStart: number;
 }

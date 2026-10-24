@@ -71,7 +71,7 @@ test('navigation : 5 onglets, notifications, profil et retour', async ({ page })
   const watch = watchPage(page);
   await createProfile(page, 'JC');
   for (const [tab, heading] of [
-    ['Projets', 'Tes projets arrivent bientôt'],
+    ['Projets', 'Projets'],
     ['Planning', 'Ton planning arrive bientôt'],
     ['Suivis', 'Tes suivis arrivent bientôt'],
     ['Finances', 'Tes finances arrivent bientôt'],
@@ -125,7 +125,7 @@ test('données conservées, hors ligne, sauvegarde chiffrée, restauration aille
   // Diagnostic : base persistante, structure à jour, hors ligne, profil relu.
   await page.goto('./#/profil/confidentialite');
   await expect(page.getByText('dans le stockage privé du navigateur.')).toBeVisible();
-  await expect(page.getByText('Version 2 sur 2.')).toBeVisible();
+  await expect(page.getByText('Version 3 sur 3.')).toBeVisible();
   await expect(page.getByText('hors ligne actuellement')).toBeVisible();
   await expect(page.getByText('relu depuis la base')).toBeVisible();
 
