@@ -1,5 +1,6 @@
 import { newId, systemClock, type Clock } from '../../core/ids';
-import type { Database } from '../../data/database';
+import type { Database, Statement } from '../../data/database';
+import { deleteMediaIfUnusedStatement, prepareMediaInsert, type NewMedia } from '../media/mediaRepository';
 
 export interface Profile {
   id: string;
@@ -17,50 +18,84 @@ export interface ProfileInput {
   lastName: string;
   nickname: string;
   phrase?: string;
-  avatarMediaId?: string | null;
 }
 
-/** Règles de validation du profil, testées séparément de l'interface. */
-export function validateProfile(input: ProfileInput): string[] {
-  const errors: string[] = [];
+/**
+ * Changement de photo demandé :
+ * - `undefined` : on garde la photo actuelle ;
+ * - `null` : on retire la photo ;
+ * - une image : elle remplace la précédente.
+ */
+export type PhotoChange = NewMedia | null | undefined;
+
+export const PROFILE_LIMITS = { nickname: 30, name: 60, phrase: 140 };
+
+export type ProfileField = 'firstName' | 'lastName' | 'nickname' | 'phrase';
+
+/** Règles de validation, champ par champ, testées séparément de l'interface. */
+export function validateProfile(input: ProfileInput): Partial<Record<ProfileField, string>> {
+  const errors: Partial<Record<ProfileField, string>> = {};
   const nick = input.nickname.trim();
-  if (nick.length < 1) errors.push('Le pseudo est obligatoire : il sert à te saluer.');
-  if (nick.length > 30) errors.push('Le pseudo fait au plus 30 caractères.');
-  if (input.firstName.trim().length > 60) errors.push('Le prénom fait au plus 60 caractères.');
-  if (input.lastName.trim().length > 60) errors.push('Le nom fait au plus 60 caractères.');
-  if ((input.phrase ?? '').trim().length > 140) errors.push('La phrase personnelle fait au plus 140 caractères.');
+  if (nick.length < 1) errors.nickname = 'Le pseudo est obligatoire : il sert à te saluer.';
+  else if ([...nick].length > PROFILE_LIMITS.nickname) errors.nickname = `Le pseudo fait au plus ${PROFILE_LIMITS.nickname} caractères.`;
+  if ([...input.firstName.trim()].length > PROFILE_LIMITS.name)
+    errors.firstName = `Le prénom fait au plus ${PROFILE_LIMITS.name} caractères.`;
+  if ([...input.lastName.trim()].length > PROFILE_LIMITS.name) errors.lastName = `Le nom fait au plus ${PROFILE_LIMITS.name} caractères.`;
+  if ([...(input.phrase ?? '').trim()].length > PROFILE_LIMITS.phrase)
+    errors.phrase = `La phrase personnelle fait au plus ${PROFILE_LIMITS.phrase} caractères.`;
   return errors;
 }
 
 /** Le profil est unique : une seule ligne, créée à l'onboarding. */
 export async function getProfile(db: Database): Promise<Profile | null> {
-  const rows = await db.all('SELECT * FROM profile LIMIT 1');
+  const rows = await db.all('SELECT * FROM profile ORDER BY created_at LIMIT 1');
   return (rows[0] as unknown as Profile | undefined) ?? null;
 }
 
-export async function saveProfile(db: Database, input: ProfileInput, clock: Clock = systemClock): Promise<Profile> {
-  const errors = validateProfile(input);
+/**
+ * Crée ou modifie le profil, photo comprise, en UNE transaction :
+ * soit tout est enregistré (profil, nouvelle photo, suppression de l'ancienne), soit rien.
+ */
+export async function saveProfile(db: Database, input: ProfileInput, photo?: PhotoChange, clock: Clock = systemClock): Promise<Profile> {
+  const errors = Object.values(validateProfile(input));
   if (errors.length) throw new Error(errors.join(' '));
   const existing = await getProfile(db);
   const now = clock.now();
+  const statements: Statement[] = [];
+
+  const previousAvatar = existing?.avatar_media_id ?? null;
+  let avatar = previousAvatar;
+  if (photo === null) avatar = null;
+  else if (photo) {
+    const prepared = await prepareMediaInsert(db, photo, now);
+    statements.push(...prepared.statements);
+    avatar = prepared.id;
+  }
+
   const values = {
     first_name: input.firstName.trim(),
     last_name: input.lastName.trim(),
     nickname: input.nickname.trim(),
     phrase: (input.phrase ?? '').trim(),
-    avatar_media_id: input.avatarMediaId === undefined ? existing?.avatar_media_id ?? null : input.avatarMediaId,
+    avatar_media_id: avatar,
   };
+
+  let profile: Profile;
   if (existing) {
-    await db.run(
-      'UPDATE profile SET first_name = ?, last_name = ?, nickname = ?, phrase = ?, avatar_media_id = ?, updated_at = ? WHERE id = ?',
-      [values.first_name, values.last_name, values.nickname, values.phrase, values.avatar_media_id, now, existing.id],
-    );
-    return { ...existing, ...values, updated_at: now };
+    profile = { ...existing, ...values, updated_at: now };
+    statements.push({
+      sql: 'UPDATE profile SET first_name = ?, last_name = ?, nickname = ?, phrase = ?, avatar_media_id = ?, updated_at = ? WHERE id = ?',
+      params: [values.first_name, values.last_name, values.nickname, values.phrase, avatar, now, existing.id],
+    });
+  } else {
+    profile = { id: newId(), ...values, created_at: now, updated_at: now };
+    statements.push({
+      sql: 'INSERT INTO profile (id, first_name, last_name, nickname, phrase, avatar_media_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      params: [profile.id, profile.first_name, profile.last_name, profile.nickname, profile.phrase, avatar, now, now],
+    });
   }
-  const profile: Profile = { id: newId(), ...values, created_at: now, updated_at: now };
-  await db.run(
-    'INSERT INTO profile (id, first_name, last_name, nickname, phrase, avatar_media_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    [profile.id, profile.first_name, profile.last_name, profile.nickname, profile.phrase, profile.avatar_media_id, now, now],
-  );
+  if (previousAvatar && previousAvatar !== avatar) statements.push(deleteMediaIfUnusedStatement(previousAvatar));
+
+  await db.transaction(statements);
   return profile;
 }

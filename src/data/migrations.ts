@@ -10,6 +10,11 @@ export interface Migration {
   version: number;
   description: string;
   statements: string[];
+  /**
+   * Si la migration crée ou transforme des données, elle applique la même transformation au contenu
+   * d'une sauvegarde plus ancienne, pour qu'une sauvegarde de l'an dernier reste restaurable.
+   */
+  upgradeBackup?: (tables: Record<string, Record<string, unknown>[]>) => void;
 }
 
 export const MIGRATIONS: Migration[] = [
@@ -57,6 +62,12 @@ export const MIGRATIONS: Migration[] = [
       )`,
       `INSERT INTO settings (key, value) VALUES ('currency', 'EUR'), ('reduced_motion', 'false')`,
     ],
+    upgradeBackup: (tables) => {
+      tables.settings ??= [
+        { key: 'currency', value: 'EUR' },
+        { key: 'reduced_motion', value: 'false' },
+      ];
+    },
   },
 ];
 
@@ -77,10 +88,7 @@ export async function migrate(db: Database): Promise<number[]> {
   }
   const applied: number[] = [];
   for (const m of MIGRATIONS.filter((m) => m.version > current)) {
-    await db.transaction([
-      ...m.statements.map((sql) => ({ sql })),
-      { sql: `PRAGMA user_version = ${m.version}` },
-    ]);
+    await db.transaction([...m.statements.map((sql) => ({ sql })), { sql: `PRAGMA user_version = ${m.version}` }]);
     applied.push(m.version);
   }
   return applied;
@@ -88,5 +96,7 @@ export async function migrate(db: Database): Promise<number[]> {
 
 /** Tables incluses dans les sauvegardes, dans un ordre compatible avec les clés étrangères. */
 export const BACKUP_TABLES = ['media', 'profile', 'settings', 'backup_log'] as const;
+/** Clé primaire de chaque table sauvegardée (« id » par défaut). */
+export const PRIMARY_KEYS: Record<string, string> = { settings: 'key' };
 /** Colonnes binaires sorties du JSON et rangées comme fichiers dans l'archive. */
 export const BLOB_COLUMNS: Record<string, string[]> = { media: ['data', 'thumb'] };

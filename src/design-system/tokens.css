@@ -12,8 +12,12 @@
 
   /* Marque */
   --brand-primary: #32aedc;
-  --brand-primary-strong: #1d7ea6; /* texte cliquable : contraste AA sur blanc */
+  --brand-primary-strong: #176f94; /* texte cliquable : contraste ≥ 4,5:1 sur blanc et sur fond doux */
   --brand-primary-soft: rgba(50, 174, 220, 0.14);
+  /* Boutons principaux : le cyan de marque est trop clair sous du texte blanc (2,5:1).
+     On garde le cyan pour la marque et la progression, et un cyan profond pour l'action (5,6:1). */
+  --action-bg: #176f94;
+  --action-text: #ffffff;
 
   /* Texte */
   --text-primary: #252b32;
@@ -69,9 +73,15 @@
     --brand-primary: #4fc0ea;
     --brand-primary-strong: #7fd3f2;
     --brand-primary-soft: rgba(79, 192, 234, 0.16);
+    --action-bg: #4fc0ea;
+    --action-text: #0e2a36;
     --text-primary: #eef2f5;
     --text-secondary: #a3adb7;
     --border-subtle: #2a333c;
+    /* États éclaircis pour rester lisibles sur fond sombre (contraste ≥ 4,5:1) */
+    --status-positive: #5cc794;
+    --status-attention: #e0a650;
+    --status-alert: #ff8a80;
     --shadow-card: none;
   }
 }

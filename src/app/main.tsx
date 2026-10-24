@@ -1,15 +1,26 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { registerSW } from 'virtual:pwa-register';
 import '../design-system/tokens.css';
 import '../design-system/components.css';
+import { PErrorBoundary, PScreen } from '../design-system/components';
 import { App } from './App';
+import { checkEnvironment, readCapabilities } from './environment';
+import { UpdateBanner } from './UpdateBanner';
 
-// Service worker : met l'application en cache pour qu'elle s'ouvre sans Internet.
-registerSW({ immediate: true });
+const root = createRoot(document.getElementById('root') as HTMLElement);
+const problem = checkEnvironment(readCapabilities());
 
-createRoot(document.getElementById('root') as HTMLElement).render(
+root.render(
   <StrictMode>
-    <App />
+    {problem ? (
+      <PScreen title={problem.title}>
+        <p className="p-subtle">{problem.detail}</p>
+      </PScreen>
+    ) : (
+      <PErrorBoundary>
+        <UpdateBanner />
+        <App />
+      </PErrorBoundary>
+    )}
   </StrictMode>,
 );

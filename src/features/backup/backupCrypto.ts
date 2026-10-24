@@ -19,9 +19,7 @@ export function isEncrypted(bytes: Uint8Array): boolean {
 }
 
 async function deriveKey(password: string, salt: Uint8Array, iterations: number): Promise<CryptoKey> {
-  const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, [
-    'deriveKey',
-  ]);
+  const material = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
     { name: 'PBKDF2', hash: 'SHA-256', salt: salt as BufferSource, iterations },
     material,
@@ -31,11 +29,7 @@ async function deriveKey(password: string, salt: Uint8Array, iterations: number)
   );
 }
 
-export async function encryptBytes(
-  plain: Uint8Array,
-  password: string,
-  iterations = PBKDF2_ITERATIONS,
-): Promise<Uint8Array> {
+export async function encryptBytes(plain: Uint8Array, password: string, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
   if (password.length < 8) throw new Error('Le mot de passe de sauvegarde fait au moins 8 caractères.');
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
   const iv = crypto.getRandomValues(new Uint8Array(IV_BYTES));
@@ -49,11 +43,7 @@ export async function encryptBytes(
   return out;
 }
 
-export async function decryptBytes(
-  file: Uint8Array,
-  password: string,
-  iterations = PBKDF2_ITERATIONS,
-): Promise<Uint8Array> {
+export async function decryptBytes(file: Uint8Array, password: string, iterations = PBKDF2_ITERATIONS): Promise<Uint8Array> {
   if (!isEncrypted(file)) throw new Error("Ce fichier n'est pas une sauvegarde chiffrée.");
   const salt = file.subarray(MAGIC.length, MAGIC.length + SALT_BYTES);
   const iv = file.subarray(MAGIC.length + SALT_BYTES, MAGIC.length + SALT_BYTES + IV_BYTES);

@@ -5,12 +5,7 @@ import type { Row, SqlValue, Statement } from './database';
  * Elle travaille sur l'objet `oo1.DB` du paquet officiel, de façon synchrone.
  */
 export interface Oo1Like {
-  exec(opts: {
-    sql: string;
-    bind?: SqlValue[];
-    rowMode?: 'object';
-    returnValue?: 'resultRows';
-  }): unknown;
+  exec(opts: { sql: string; bind?: SqlValue[]; rowMode?: 'object'; returnValue?: 'resultRows' }): unknown;
 }
 
 export function runSync(db: Oo1Like, sql: string, params: SqlValue[] = []): void {

@@ -11,8 +11,8 @@ export function Welcome({ db, onDone }: { db: Database; onDone: (p: Profile) => 
   if (step === 'hello') {
     return (
       <main className="p-welcome">
-        <img className="p-welcome__mark" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" />
-        <h1>PISTIS</h1>
+        <img className="p-welcome__mark" src={`${import.meta.env.BASE_URL}icon.svg`} alt="" width="72" height="72" />
+        <h1 className="p-welcome__title">PISTIS</h1>
         <p className="p-signature">Organise ta vie. Développe ton potentiel. Construis ton avenir.</p>
         <p className="p-subtle">
           Bienvenue sur PISTIS. Un espace pour organiser ta vie, suivre tes progrès et construire ton avenir. Tout reste sur ton appareil :
@@ -32,7 +32,14 @@ export function Welcome({ db, onDone }: { db: Database; onDone: (p: Profile) => 
         <h1 className="p-greeting">Crée ton profil</h1>
         <p className="p-subtle">Quelques informations pour personnaliser ton espace. Tu pourras tout modifier plus tard.</p>
       </div>
-      <ProfileForm db={db} profile={null} currentAvatar={null} submitLabel="Créer mon espace" onSaved={onDone} />
+      <ProfileForm
+        db={db}
+        profile={null}
+        currentAvatar={null}
+        submitLabel="Créer mon espace"
+        onSaved={onDone}
+        onCancel={() => setStep('hello')}
+      />
     </main>
   );
 }
