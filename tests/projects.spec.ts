@@ -6,7 +6,10 @@ test('modèle → assistant → projet : Pourquoi obligatoire, progression réel
   await createProfile(page, 'JC');
 
   // Accueil sans projet : la priorité du jour invite à créer le premier projet.
-  await page.getByRole('link', { name: /Choisir un modèle/ }).click();
+  await page
+    .getByRole('region', { name: 'Ma priorité du jour' })
+    .getByRole('link', { name: /Choisir un modèle/ })
+    .click();
   await page.getByRole('link', { name: /Créer mon entreprise/ }).click();
   await expect(page.getByText('Exemples de Pourquoi')).toBeVisible();
   await page.getByRole('link', { name: /Utiliser ce modèle/ }).click();

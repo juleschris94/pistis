@@ -7,6 +7,12 @@ import { ProjectDetailScreen } from '../features/projects/ProjectDetailScreen';
 import { ProjectsScreen } from '../features/projects/ProjectsScreen';
 import { TemplateScreen, TemplatesScreen } from '../features/projects/TemplatesScreen';
 import { ModuleScreen } from '../features/modules/ModuleScreen';
+import { PlanningScreen } from '../features/agenda/PlanningScreen';
+import { AccountScreen } from '../features/finance/AccountScreen';
+import { FinanceImportScreen } from '../features/finance/FinanceImportScreen';
+import { FinanceScreen } from '../features/finance/FinanceScreen';
+import { TransactionsScreen } from '../features/finance/TransactionsScreen';
+import { ConnectorsScreen } from '../features/settings/ConnectorsScreen';
 import { NotificationsScreen } from '../features/notifications/NotificationsScreen';
 import { AppearanceScreen } from '../features/settings/AppearanceScreen';
 import { BackupScreen } from '../features/settings/BackupScreen';
@@ -30,9 +36,13 @@ const routes: RouteObject[] = [
       { path: ROUTES.wizard, element: <GoalWizard /> },
       { path: ROUTES.project, element: <ProjectDetailScreen /> },
       { path: ROUTES.projectEdit, element: <GoalEditScreen /> },
-      { path: ROUTES.planning, element: <ModuleScreen module="planning" /> },
+      { path: ROUTES.planning, element: <PlanningScreen /> },
       { path: ROUTES.tracking, element: <ModuleScreen module="tracking" /> },
-      { path: ROUTES.finance, element: <ModuleScreen module="finance" /> },
+      { path: ROUTES.finance, element: <FinanceScreen /> },
+      { path: ROUTES.financeImport, element: <FinanceImportScreen /> },
+      { path: ROUTES.transactions, element: <TransactionsScreen /> },
+      { path: ROUTES.account, element: <AccountScreen /> },
+      { path: ROUTES.connectors, element: <ConnectorsScreen /> },
       { path: ROUTES.notifications, element: <NotificationsScreen /> },
       { path: ROUTES.settings, element: <SettingsScreen /> },
       { path: ROUTES.profileEdit, element: <ProfileEditScreen /> },

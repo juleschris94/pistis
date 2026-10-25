@@ -1,5 +1,26 @@
 # Historique des versions
 
+## 0.3.0 — 25 octobre 2026
+
+Finances et Planning deviennent utilisables ; premiers connecteurs, 100 % locaux.
+
+### Ajouté
+
+- **Finances** : import de relevés OFX et CSV (La Banque Postale, BoursoBank, Hello bank!, Revolut, LCL,
+  Crédit Agricole, BNP Paribas, Swile et autres). Colonnes reconnues automatiquement et corrigeables,
+  encodage Windows-1252, débit / crédit séparés, aucun doublon en réimportant. Comptes, soldes datés
+  (fichier ou saisie), entrées et sorties du mois, recherche dans les opérations.
+- **Planning** : semaine, agendas importés en `.ics` (Google, Outlook, Apple ; `.zip` de Google accepté),
+  répétitions, fuseaux horaires, occurrences modifiées ; tâches datées du jour.
+- **Itinéraires** : bouton « Y aller » vers Google Maps, Plans ou Waze.
+- **Connecteurs** (Profil) : statut honnête de chaque connecteur ; plan de la connexion bancaire automatique
+  et de la synchronisation des agendas dans `docs/connecteurs.md`.
+- Base : migration v4 (comptes, opérations, imports, agendas), incluse dans les sauvegardes.
+
+### Sécurité
+
+- PISTIS ne demande jamais d'identifiants bancaires (vérifié par un test navigateur).
+
 ## 0.2.2 — 25 octobre 2026
 
 Version web accessible par lien.

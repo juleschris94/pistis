@@ -7,8 +7,9 @@ Version web d'abord (PWA utilisable sur ordinateur et Android, en local ou hébe
 | M0 | Socle technique : SQLite local (OPFS), migrations, sauvegardes `.pistis` chiffrables, hors ligne | ✅ 0.0.2 |
 | M1 | Identité visuelle, accueil, tableau de bord, profil et paramètres, français/anglais | ✅ 0.1.0 |
 | **M2** | **Projets : idées, modèles, assistant (objectif → Pourquoi → vision → plan), étapes, tâches, progression réelle, priorités du jour, ajout rapide** | ✅ **0.2.0** |
-| M3 | Planning : semaine et journée, engagements récurrents, constance (sans série culpabilisante), rappels locaux | à faire |
-| M4 | Finances : budget, épargne liée aux projets (centimes entiers), courses et repas | à faire |
+| M3 | Planning : semaine, agendas importés (.ics), tâches datées, itinéraires · reste : engagements récurrents, constance, rappels | 🟡 0.3.0 |
+| M4 | Finances : comptes et opérations importés (OFX, CSV), mois en cours · reste : catégories, budgets, épargne liée aux projets | 🟡 0.3.0 |
+| C1 | Connecteurs automatiques : banques via agrégateur agréé + relais, synchro Google Agenda / Outlook (voir docs/connecteurs.md) | à faire |
 | M5 | Suivis : habitudes, indicateurs, revues hebdomadaires | à faire |
 | M6 | Notifications locales, centre de notifications, revue du dimanche | à faire |
 | M7 | Simulations (« et si… ») isolées des données réelles | à faire |

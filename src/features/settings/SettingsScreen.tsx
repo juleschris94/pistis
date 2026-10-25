@@ -1,4 +1,4 @@
-import { Bell, Coins, DatabaseBackup, Languages, LayoutGrid, Palette, Pencil, ShieldCheck } from 'lucide-react';
+import { Bell, Coins, DatabaseBackup, Languages, LayoutGrid, Palette, Pencil, Plug, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../app/AppContext';
 import { ROUTES } from '../../app/paths';
 import { APP_VERSION } from '../../app/services';
@@ -57,6 +57,13 @@ export function SettingsScreen() {
           to={ROUTES.language}
         />
         <PListRow icon={Coins} color="var(--cat-finance)" title={t('settings.currency')} subtitle={t('settings.currency.eur')} />
+        <PListRow
+          icon={Plug}
+          color="var(--cat-admin)"
+          title={t('connectors.title')}
+          subtitle={t('connectors.subtitle')}
+          to={ROUTES.connectors}
+        />
         <PListRow
           icon={Bell}
           color="var(--cat-housing)"

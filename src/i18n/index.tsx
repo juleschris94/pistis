@@ -39,6 +39,9 @@ export function createI18n(language: Language) {
     formatDate: (date: Date | number, options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(locale, options).format(date),
     formatNumber: (value: number, options?: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale, options).format(value),
     formatBytes: (n: number | null) => formatBytes(n, locale, language),
+    /** Montant en centimes entiers → « 1 234,56 € ». `signed` : « +12,00 € » / « −12,00 € ». */
+    formatMoney: (cents: number, currency: string, opts: { signed?: boolean } = {}) =>
+      new Intl.NumberFormat(locale, { style: 'currency', currency, signDisplay: opts.signed ? 'exceptZero' : 'auto' }).format(cents / 100),
     /** Message lisible pour n'importe quelle erreur : code connu → texte traduit, sinon texte générique + détail. */
     formatError: (error: unknown) => {
       if (isPistisError(error)) return t(`errors.${error.code}` as MessageKey, error.params);

@@ -293,7 +293,7 @@ export function HomeScreen() {
         </h2>
         <PList>
           {settings.categories.map((id) => {
-            const available = id === 'projects';
+            const available = id === 'projects' || id === 'finance';
             const count = goals.filter((g) => g.goal.category === id && g.goal.status === 'active').length;
             return (
               <PListRow

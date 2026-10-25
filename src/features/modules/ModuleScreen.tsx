@@ -1,4 +1,4 @@
-import { CalendarDays, CheckCircle2, ListChecks, Wallet, type LucideIcon } from 'lucide-react';
+import { CheckCircle2, ListChecks, type LucideIcon } from 'lucide-react';
 import { useApp } from '../../app/AppContext';
 import { CATEGORY_VISUALS } from '../../app/categoryVisuals';
 import { CATEGORY_TAB } from '../../content/categories';
@@ -6,20 +6,12 @@ import { CATEGORY_MILESTONE, TAB_MILESTONE } from '../../content/roadmap';
 import { PBadge, PCard, PEmpty, PList, PListRow, PTopBar } from '../../design-system/components';
 import { useI18n, type MessageKey } from '../../i18n';
 
-type ModuleId = Exclude<keyof typeof TAB_MILESTONE, 'projects'>;
+type ModuleId = keyof typeof TAB_MILESTONE;
 
 const MODULES: Record<ModuleId, { icon: LucideIcon; features: MessageKey[] }> = {
-  planning: {
-    icon: CalendarDays,
-    features: ['module.planning.f1', 'module.planning.f2', 'module.planning.f3', 'module.planning.f4'],
-  },
   tracking: {
     icon: ListChecks,
     features: ['module.tracking.f1', 'module.tracking.f2', 'module.tracking.f3', 'module.tracking.f4'],
-  },
-  finance: {
-    icon: Wallet,
-    features: ['module.finance.f1', 'module.finance.f2', 'module.finance.f3', 'module.finance.f4'],
   },
 };
 

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { CURRENT_SCHEMA_VERSION } from '../src/data/migrations';
 import { createProfile, fixture, nav, useDownloadsForBackups, watchPage } from './helpers';
 
 const PASSWORD = 'mot-de-passe-test';
@@ -72,9 +73,9 @@ test('navigation : 5 onglets, notifications, profil et retour', async ({ page })
   await createProfile(page, 'JC');
   for (const [tab, heading] of [
     ['Projets', 'Projets'],
-    ['Planning', 'Ton planning arrive bientôt'],
+    ['Planning', 'Planning'],
     ['Suivis', 'Tes suivis arrivent bientôt'],
-    ['Finances', 'Tes finances arrivent bientôt'],
+    ['Finances', 'Finances'],
   ]) {
     await nav(page, tab).click();
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
@@ -125,7 +126,7 @@ test('données conservées, hors ligne, sauvegarde chiffrée, restauration aille
   // Diagnostic : base persistante, structure à jour, hors ligne, profil relu.
   await page.goto('./#/profil/confidentialite');
   await expect(page.getByText('dans le stockage privé du navigateur.')).toBeVisible();
-  await expect(page.getByText('Version 3 sur 3.')).toBeVisible();
+  await expect(page.getByText(`Version ${CURRENT_SCHEMA_VERSION} sur ${CURRENT_SCHEMA_VERSION}.`)).toBeVisible();
   await expect(page.getByText('hors ligne actuellement')).toBeVisible();
   await expect(page.getByText('relu depuis la base')).toBeVisible();
 

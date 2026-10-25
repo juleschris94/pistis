@@ -63,8 +63,8 @@ en ligne. On passe de l'une à l'autre avec une sauvegarde `.pistis`.
 | `npm run typecheck` | Types TypeScript de tout le projet |
 | `npm run lint` | Erreurs courantes et règles React (ESLint) |
 | `npm run format` | Met le code en forme (Prettier) ; `format:check` vérifie sans modifier |
-| `npm test` | 84 tests : projets, étapes et tâches, progression, priorités du jour, modèles, migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
-| `npm run test:e2e` | 8 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : modèle → assistant → projet, tâches et priorités du jour, ajout rapide et idée → projet, accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
+| `npm test` | 136 tests : relevés bancaires (OFX, CSV de 5 banques), montants en centimes, agendas .ics (fuseaux, répétitions), projets, étapes et tâches, progression, priorités du jour, modèles, migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
+| `npm run test:e2e` | 11 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : import de relevés et d'agenda, itinéraires, modèle → assistant → projet, tâches et priorités du jour, ajout rapide et idée → projet, accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
 
 Première exécution des tests navigateur : `npx playwright install chromium`.
 
@@ -96,6 +96,7 @@ Règle d'or : les écrans n'écrivent jamais de SQL et ne contiennent aucun calc
 - [docs/data-and-backup.md](docs/data-and-backup.md) — stockage, onglets, migrations, format `.pistis`
 - [docs/business-rules.md](docs/business-rules.md) — règles métier (Pourquoi, progression, priorités du jour)
 - [docs/roadmap.md](docs/roadmap.md) — jalons et prochaines étapes
+- [docs/connecteurs.md](docs/connecteurs.md) — banques, agendas, cartes, santé : ce qui marche et le plan
 - [docs/idees.md](docs/idees.md) — idées d'amélioration retenues et leur jalon
 - [CHANGELOG.md](CHANGELOG.md) — historique des versions
 - Document d'architecture complet : « PISTIS V1 — Audit et architecture » (référence produit)
