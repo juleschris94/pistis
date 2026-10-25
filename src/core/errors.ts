@@ -14,6 +14,7 @@ export const ERROR_CODES = [
   'image.canvasUnavailable',
   'image.encodeFailed',
   'backup.empty',
+  'backup.saveUnavailable',
   'backup.tooLarge',
   'backup.needsPassword',
   'backup.wrongPassword',

@@ -46,5 +46,5 @@ const routes: RouteObject[] = [
   },
 ];
 
-// La version d'essai tourne dans une page intégrée dont l'adresse ne peut pas changer : routeur en mémoire.
-export const router = import.meta.env.MODE === 'demo' ? createMemoryRouter(routes) : createHashRouter(routes);
+// La version web hébergée tourne dans une page intégrée dont l'adresse ne peut pas changer : routeur en mémoire.
+export const router = import.meta.env.MODE === 'hosted' ? createMemoryRouter(routes) : createHashRouter(routes);

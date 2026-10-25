@@ -1689,56 +1689,6 @@ select.p-input {
   margin-left: 6px;
 }
 
-/* Bandeau de la version d'essai (jamais affiché dans l'application réelle). */
-.p-demo {
-  position: relative;
-  z-index: 40;
-  background: var(--surface-sunken);
-  border-bottom: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-  font-size: 14px;
-  padding: 8px max(16px, env(safe-area-inset-left, 0px));
-}
-.p-demo__row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  max-width: 960px;
-  margin: 0 auto;
-}
-.p-demo__row svg {
-  width: 16px;
-  height: 16px;
-  color: var(--brand-champagne);
-}
-.p-demo__row strong {
-  color: var(--text-primary);
-}
-.p-demo__body {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-  max-width: 960px;
-  margin: 8px auto 0;
-}
-.p-demo__body p {
-  margin: 0;
-  max-width: 65ch;
-}
-.p-demo__link {
-  background: none;
-  border: 0;
-  padding: 4px 0;
-  color: var(--brand-text);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-.p-demo__link--danger {
-  color: var(--status-alert);
-}
-
 .p-check__action {
   margin-top: 10px;
 }

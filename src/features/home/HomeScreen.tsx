@@ -52,7 +52,9 @@ interface FirstStep {
 }
 
 function firstSteps(hasPhoto: boolean, hasProject: boolean, hasBackup: boolean, install: InstallState): FirstStep[] {
-  return [
+  // Version web hébergée (page intégrée) : on ne peut pas l'installer, l'étape n'a pas de sens.
+  const installable = import.meta.env.MODE !== 'hosted';
+  const steps: FirstStep[] = [
     { id: 'profile', done: true, icon: UserRound, title: 'home.steps.profile', body: 'home.steps.profile.body' },
     {
       id: 'project',
@@ -87,6 +89,7 @@ function firstSteps(hasPhoto: boolean, hasProject: boolean, hasBackup: boolean, 
       action: install === 'available' ? { label: 'home.steps.install.action', run: () => void promptInstall() } : undefined,
     },
   ];
+  return steps.filter((step) => installable || step.id !== 'install');
 }
 
 /** Accueil : « Que dois-je faire aujourd'hui pour avancer vers ce qui compte pour moi ? » */

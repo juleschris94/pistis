@@ -54,7 +54,7 @@ export function PrivacyScreen() {
 
   const restarted = profile.created_at < sessionStart;
   const persisted = status?.storage.persisted;
-  const checks: { state: CheckState; title: string; detail: string }[] = [
+  const allChecks: { state: CheckState; title: string; detail: string }[] = [
     {
       state: !status ? 'wait' : status.info.mode === 'persistent' ? 'ok' : 'warn',
       title: t('diag.database'),
@@ -106,6 +106,8 @@ export function PrivacyScreen() {
       detail: install === 'installed' ? t('diag.install.ok') : t('diag.install.notYet'),
     },
   ];
+  // Version web hébergée : pas d'installation possible, ce contrôle n'a pas de sens.
+  const checks = allChecks.filter((c) => import.meta.env.MODE !== 'hosted' || c.title !== t('diag.install'));
   const done = checks.filter((c) => c.state === 'ok').length;
   const stateLabel = (s: CheckState) => t(s === 'ok' ? 'diag.state.ok' : s === 'warn' ? 'diag.state.warn' : 'diag.state.wait');
 

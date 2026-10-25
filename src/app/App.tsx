@@ -14,7 +14,6 @@ import { router } from './routes';
 import { getDatabase, subscribeConnection, takeOverFromOtherTab } from './services';
 import { applyReducedMotion, applyThemePreference } from './theme';
 import { UpdateBanner } from './UpdateBanner';
-import { DemoBanner } from '../demo/DemoBanner';
 
 const sessionStart = Date.now();
 const browserLanguage = detectLanguage(typeof navigator === 'undefined' ? [] : navigator.languages);
@@ -93,7 +92,6 @@ export function App() {
 
   return (
     <I18nProvider language={language}>
-      {import.meta.env.MODE === 'demo' && <DemoBanner />}
       <UpdateBanner inApp={appData !== null} />
       <Content connection={connection} data={data} appData={appData} loadError={loadError} reload={() => setVersion((v) => v + 1)} />
     </I18nProvider>

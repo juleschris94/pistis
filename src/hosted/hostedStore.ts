@@ -1,6 +1,7 @@
 /**
- * Copie de la base de démonstration dans IndexedDB (une seule entrée).
- * Toute erreur (navigation privée, stockage bloqué) est absorbée : la démo fonctionne alors en mémoire.
+ * Copie de la base de la version web hébergée dans IndexedDB (une seule entrée).
+ * Toute erreur (navigation privée, stockage bloqué) est absorbée : la page fonctionne alors en mémoire.
+ * Nom historique conservé : ce qui a été saisi dans la version d'essai, à la même adresse, est gardé.
  */
 const DB_NAME = 'pistis-demo';
 const STORE = 'files';
@@ -15,7 +16,7 @@ function open(): Promise<IDBDatabase> {
   });
 }
 
-export async function loadDemoBytes(): Promise<{ available: boolean; bytes: Uint8Array | null }> {
+export async function loadHostedBytes(): Promise<{ available: boolean; bytes: Uint8Array | null }> {
   try {
     const idb = await open();
     const bytes = await new Promise<Uint8Array | null>((resolve, reject) => {
@@ -30,7 +31,7 @@ export async function loadDemoBytes(): Promise<{ available: boolean; bytes: Uint
   }
 }
 
-export async function saveDemoBytes(bytes: Uint8Array): Promise<boolean> {
+export async function saveHostedBytes(bytes: Uint8Array): Promise<boolean> {
   try {
     const idb = await open();
     await new Promise<void>((resolve, reject) => {
@@ -44,21 +45,4 @@ export async function saveDemoBytes(bytes: Uint8Array): Promise<boolean> {
   } catch {
     return false;
   }
-}
-
-/** Efface la démonstration (base et thème mémorisé) pour repartir de zéro. */
-export async function resetDemo(): Promise<void> {
-  try {
-    localStorage.removeItem('pistis-theme');
-  } catch {
-    // sans conséquence
-  }
-  await new Promise<void>((resolve) => {
-    try {
-      const req = indexedDB.deleteDatabase(DB_NAME);
-      req.onsuccess = req.onerror = req.onblocked = () => resolve();
-    } catch {
-      resolve();
-    }
-  });
 }

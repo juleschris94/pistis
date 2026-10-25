@@ -22,7 +22,7 @@ Version web d'abord (PWA utilisable sur ordinateur et Android, en local ou hébe
 3. Règle de constance : semaines tenues / semaines prévues, jamais de compteur remis à zéro par un oubli.
 4. Revue du soir facultative : ce qui est fait, ce qui glisse à demain (choix de l'utilisateur).
 
-## Version d'essai
+## Versions web
 
-`npm run build:demo` produit `dist-demo/index.html`, un fichier unique publiable comme page d'essai
-(voir `vite.demo.config.ts`). L'application réelle n'en dépend pas.
+- Installable (PWA hors ligne) : `npm run build`, à héberger en https (voir README).
+- Hébergée (page ouverte par lien) : `npm run build:hosted` → `dist-hosted/pistis.html`.

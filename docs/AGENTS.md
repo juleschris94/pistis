@@ -26,12 +26,13 @@ et à toute personne qui contribue.
   Texte sur un bouton principal : jetons `--action-bg` / `--action-text` (contraste vérifié), jamais une couleur de marque prise au hasard.
 - Textes, catégories, citations : à terme dans `src/content/` (JSON), jamais dispersés dans le code.
 
-## Version d'essai
+## Version web hébergée
 
-`vite.demo.config.ts` remplace le pilote de base (`src/data/web/webDatabase`) par `src/demo/demoDatabase.ts`
-(sql.js en JavaScript pur) et désactive service worker et CSP, **pour la version d'essai seulement**.
-Ne jamais importer `src/demo/` depuis l'application ; le code propre à l'essai est protégé par
-`import.meta.env.MODE === 'demo'` et disparaît de la version réelle.
+`vite.hosted.config.ts` remplace le pilote de base (`src/data/web/webDatabase`) par `src/hosted/hostedDatabase.ts`
+(sql.js en JavaScript pur, copie dans IndexedDB) et désactive service worker et CSP, **pour cette version seulement**.
+Ne jamais importer `src/hosted/` depuis l'application ; le code propre à cette version est protégé par
+`import.meta.env.MODE === 'hosted'` et disparaît de la version installable. Promesse inchangée : aucune donnée
+ne quitte le navigateur, sauf le fichier de sauvegarde que l'utilisateur choisit d'enregistrer.
 
 ## Liste de contrôle pour un nouveau texte ou une nouvelle erreur
 

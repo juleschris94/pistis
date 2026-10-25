@@ -3,17 +3,18 @@ import type { Database as SqlJsDatabase, SqlValue as SqlJsValue } from 'sql.js';
 import { PistisError } from '../core/errors';
 import type { Row, SqlValue, Statement, StorageInfo } from '../data/database';
 import type { ConnectionState, WebDatabase } from '../data/web/webDatabase';
-import { loadDemoBytes, saveDemoBytes } from './demoStore';
+import { loadHostedBytes, saveHostedBytes } from './hostedStore';
 
 /**
- * Pilote de la VERSION DE DÉMONSTRATION (page d'essai en ligne).
+ * Pilote de la VERSION WEB HÉBERGÉE (page intégrée, accessible par lien).
  *
  * Même interface que le pilote navigateur, mais SQLite tourne directement dans la page
  * (version JavaScript pure de sql.js : ni WebAssembly, ni travailleur, ni OPFS), car une page
- * d'essai intégrée n'a pas accès à ces fonctions. Les données sont recopiées dans IndexedDB
- * après chaque modification, quand le navigateur le permet ; sinon elles vivent en mémoire.
+ * intégrée n'a pas accès à ces fonctions. Les données sont recopiées dans IndexedDB après chaque
+ * modification (et quand la page passe en arrière-plan) ; si le navigateur refuse, elles vivent en mémoire
+ * et l'écran Confidentialité le signale.
  *
- * Ce fichier n'est jamais inclus dans l'application réelle (voir vite.demo.config.ts).
+ * Ce fichier n'est jamais inclus dans l'application installable (voir vite.hosted.config.ts).
  */
 export function createWebDatabase(onState: (state: ConnectionState) => void): WebDatabase {
   let persistent = false;
@@ -21,7 +22,7 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
 
   const ready: Promise<SqlJsDatabase> = (async () => {
     const SQL = await initSqlJs();
-    const saved = await loadDemoBytes();
+    const saved = await loadHostedBytes();
     persistent = saved.available;
     const db = new SQL.Database(saved.bytes ?? undefined);
     db.run('PRAGMA foreign_keys = ON');
@@ -33,19 +34,29 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
     (e: unknown) => onState({ kind: 'failed', error: new PistisError('db.storageUnavailable', { detail: String(e) }) }),
   );
 
+  let pending: SqlJsDatabase | null = null;
+  const flush = () => {
+    if (!saveTimer || !pending) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    // export() rouvre la base en interne : on réactive les clés étrangères juste après.
+    const bytes = pending.export();
+    pending.run('PRAGMA foreign_keys = ON');
+    void saveHostedBytes(bytes).then((ok) => {
+      if (!ok) persistent = false;
+    });
+  };
   const scheduleSave = (db: SqlJsDatabase) => {
     if (!persistent) return;
+    pending = db;
     if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      saveTimer = null;
-      // export() rouvre la base en interne : on réactive les clés étrangères juste après.
-      const bytes = db.export();
-      db.run('PRAGMA foreign_keys = ON');
-      void saveDemoBytes(bytes).then((ok) => {
-        if (!ok) persistent = false;
-      });
-    }, 250);
+    saveTimer = setTimeout(flush, 250);
   };
+  // Page masquée ou fermée : on écrit tout de suite ce qui attend encore.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flush();
+  });
+  window.addEventListener('pagehide', flush);
 
   const toBind = (params: SqlValue[] = []) => params as SqlJsValue[];
 
@@ -95,7 +106,7 @@ export function createWebDatabase(onState: (state: ConnectionState) => void): We
     async info(): Promise<StorageInfo> {
       const db = await ready;
       const version = String(allSync(db, 'SELECT sqlite_version() AS v')[0]?.v ?? '');
-      return { sqliteVersion: version, mode: persistent ? 'persistent' : 'memory', detail: persistent ? 'demo-indexeddb' : 'demo-memory' };
+      return { sqliteVersion: version, mode: persistent ? 'persistent' : 'memory', detail: persistent ? 'indexeddb' : 'memory' };
     },
     takeOver() {
       // Une seule page d'essai : rien à reprendre.

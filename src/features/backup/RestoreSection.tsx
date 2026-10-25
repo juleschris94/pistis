@@ -80,7 +80,7 @@ export function RestoreSection({ db, onRestored, standalone }: { db: Database; o
           icon={FileUp}
           variant={standalone ? 'primary' : 'secondary'}
           label={file ? t('backup.restore.chooseOther') : t('backup.restore.choose')}
-          accept=".pistis,application/octet-stream"
+          accept=".pistis,.zip,application/octet-stream,application/zip"
           onFile={(f) => {
             setFile(f);
             setParsed(null);

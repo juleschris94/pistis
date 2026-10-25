@@ -1,8 +1,8 @@
-// Transforme dist-demo/index.html (document complet) en page publiable : le service d'hébergement
+// Transforme dist-hosted/index.html (document complet) en page publiable : le service d'hébergement
 // ajoute lui-même <!doctype>, <html>, <head> et <body>. On garde le titre, le style, la racine et le script.
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const [input = 'dist-demo/index.html', output = 'dist-demo/pistis-essai.html'] = process.argv.slice(2);
+const [input = 'dist-hosted/index.html', output = 'dist-hosted/pistis.html'] = process.argv.slice(2);
 const html = readFileSync(input, 'utf8');
 
 const scriptStart = html.indexOf('<script type="module"');

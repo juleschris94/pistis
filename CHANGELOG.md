@@ -1,5 +1,22 @@
 # Historique des versions
 
+## 0.2.2 — 25 octobre 2026
+
+Version web accessible par lien.
+
+### Ajouté
+
+- Version web hébergée (`npm run build:hosted`) : un seul fichier, ouvrable depuis un téléphone ou un ordinateur.
+  Données gardées dans le navigateur (IndexedDB, écriture immédiate quand la page passe en arrière-plan).
+- Sauvegardes depuis cette version : fichier `.pistis.zip` proposé par la fenêtre d'enregistrement de l'hôte ;
+  la restauration accepte `.pistis` et `.pistis.zip`.
+- Paquet prêt à héberger de la version installable (fonctionne aussi dans un sous-dossier).
+
+### Modifié
+
+- La version d'essai devient la version web : plus de bandeau « essai » ; les données déjà saisies sont gardées.
+- Étape « Installer PISTIS » masquée là où l'installation est impossible.
+
 ## 0.2.1 — 25 octobre 2026
 
 Nouvelle identité de couleurs « forêt et or », d'après le second modèle visuel.

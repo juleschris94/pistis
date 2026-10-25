@@ -5,4 +5,4 @@ dist/
 *.log
 test-results/
 playwright-report/
-dist-demo/
+dist-hosted/

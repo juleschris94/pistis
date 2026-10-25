@@ -26,7 +26,6 @@ export function BackupScreen() {
           {freshness.kind === 'never' && ` ${t('backup.freshness.first')}`}
         </PMessage>
       )}
-      {import.meta.env.MODE === 'demo' && <PMessage tone="attention">{t('demo.backup')}</PMessage>}
       <PCard title={t('backup.export.title')}>
         <ExportSection db={db} appVersion={APP_VERSION} onDone={() => setRefreshKey((k) => k + 1)} />
       </PCard>

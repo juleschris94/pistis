@@ -1,6 +1,6 @@
 {
   "name": "pistis",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "description": "PISTIS — organise ta vie, développe ton potentiel, construis ton avenir. Application locale hors ligne.",
@@ -16,7 +16,7 @@
     "check": "npm run typecheck && npm run lint && npm run format:check && npm test && npm run test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:demo": "vite build --config vite.demo.config.ts --mode demo"
+    "build:hosted": "vite build --config vite.hosted.config.ts --mode hosted && node scripts/make-hosted-page.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

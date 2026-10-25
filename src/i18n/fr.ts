@@ -46,16 +46,6 @@ export const fr = {
   'tabs.yielded.action': 'Utiliser ici',
 
   // Mises à jour
-  'demo.label': 'Version d’essai',
-  'demo.backup': 'Version d’essai : l’export ne peut pas enregistrer de fichier sur cette page. Il fonctionne dans l’application complète.',
-  'demo.body':
-    'Ce que tu crées ici reste dans ce navigateur. L’export de sauvegarde et l’installation sont réservés à l’application complète.',
-  'demo.reset': 'Tout effacer',
-  'demo.reset.confirm': 'Effacer toutes les données de l’essai ?',
-  'demo.reset.yes': 'Oui, effacer',
-  'demo.reset.no': 'Annuler',
-  'demo.more': 'En savoir plus',
-  'demo.less': 'Masquer',
   'update.ready': 'Une nouvelle version de PISTIS est prête.',
   'update.apply': 'Mettre à jour',
   'update.later': 'Plus tard',
@@ -470,6 +460,8 @@ export const fr = {
   'errors.image.tooManyPixels': 'Image trop grande en pixels. Réduis-la avant de l’importer.',
   'errors.image.canvasUnavailable': 'Traitement d’image indisponible dans ce navigateur.',
   'errors.image.encodeFailed': 'Impossible d’enregistrer l’image : mémoire insuffisante ?',
+  'errors.backup.saveUnavailable':
+    'L’enregistrement du fichier n’est pas disponible ici. Ouvre PISTIS dans le navigateur ou l’application Claude pour sauvegarder.',
   'errors.backup.empty': 'Le fichier est vide.',
   'errors.backup.tooLarge': 'Fichier trop volumineux pour une sauvegarde PISTIS.',
   'errors.backup.needsPassword': 'Cette sauvegarde est chiffrée : saisis son mot de passe.',

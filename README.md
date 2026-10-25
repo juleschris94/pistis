@@ -20,17 +20,22 @@ npm run dev          # version de développement : http://localhost:5173
 npm run build        # version finale dans le dossier dist/
 npm run preview      # sert la version finale : http://localhost:4173
 npm run check        # TOUTES les vérifications (voir « Qualité » ci-dessous)
-npm run build:demo   # version d'essai en un seul fichier : dist-demo/index.html
+npm run build:hosted # version web hébergée en un seul fichier : dist-hosted/pistis.html
 ```
 
 Le mode hors ligne et la politique de sécurité ne sont actifs que dans la version finale (`build` puis `preview`).
 
-## Version d'essai
+## Deux façons d'utiliser PISTIS sur le web
 
-`npm run build:demo` produit un fichier HTML unique qui s'ouvre partout, même intégré dans une autre page :
-SQLite y tourne en JavaScript pur, les données sont gardées dans le navigateur (IndexedDB), un bandeau
-« Version d'essai » permet de tout effacer. L'export de sauvegarde et l'installation n'y sont pas disponibles.
-L'application réelle n'est pas concernée (`vite.demo.config.ts` ne sert qu'à cette version).
+| | Version installable (`npm run build`) | Version web hébergée (`npm run build:hosted`) |
+| --- | --- | --- |
+| Où | N'importe quel hébergement https (Netlify, GitHub Pages…) | Une page intégrée, ex. une page claude.ai, ouverte par lien |
+| Stockage | SQLite (OPFS) dans le navigateur | SQLite (sql.js) dans la page, copie dans IndexedDB |
+| Hors ligne, installation | Oui | Non |
+| Sauvegardes | Fichier `.pistis` | Fichier `.pistis.zip` via la fenêtre d'enregistrement de l'hôte |
+
+Les deux lisent les sauvegardes de l'autre : on passe de l'une à l'autre sans rien perdre.
+La version hébergée est produite par `vite.hosted.config.ts` et `src/hosted/` ; elle ne modifie pas la version installable.
 
 ## Utiliser PISTIS sur ton téléphone
 
@@ -69,7 +74,7 @@ Première exécution des tests navigateur : `npx playwright install chromium`.
 src/
   app/            démarrage, routes, coque (onglets), thème, installation
   content/        domaines, modèles de projets, illustrations, jalons, encouragements
-  demo/           pilote et bandeau de la version d'essai (jamais dans l'application réelle)
+  hosted/         pilote de la version web hébergée (jamais dans la version installable)
   domain/         règles métier pures : projets, progression, priorités du jour
   core/           outils communs (erreurs, identifiants, horloge, semaine)
   data/           accès aux données : interface Database, pilotes, migrations
