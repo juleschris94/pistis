@@ -30,7 +30,9 @@ export default defineConfig({
     { name: 'ordinateur', use: { ...devices['Desktop Chrome'], launchOptions: { executablePath } } },
   ],
   webServer: {
+    // Identifiant Google factice : active l'écran Google Agenda ; les appels à Google sont simulés dans les tests.
     command: 'npm run build && npm run preview',
+    env: { VITE_GOOGLE_CLIENT_ID: 'e2e-test.apps.googleusercontent.com' },
     url: 'http://localhost:4173/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

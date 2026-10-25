@@ -63,8 +63,8 @@ en ligne. On passe de l'une à l'autre avec une sauvegarde `.pistis`.
 | `npm run typecheck` | Types TypeScript de tout le projet |
 | `npm run lint` | Erreurs courantes et règles React (ESLint) |
 | `npm run format` | Met le code en forme (Prettier) ; `format:check` vérifie sans modifier |
-| `npm test` | 136 tests : relevés bancaires (OFX, CSV de 5 banques), montants en centimes, agendas .ics (fuseaux, répétitions), projets, étapes et tâches, progression, priorités du jour, modèles, migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
-| `npm run test:e2e` | 11 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : import de relevés et d'agenda, itinéraires, modèle → assistant → projet, tâches et priorités du jour, ajout rapide et idée → projet, accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
+| `npm test` | 143 tests : Google Agenda (connexion, synchronisation), relevés bancaires (OFX, CSV de 5 banques), montants en centimes, agendas .ics (fuseaux, répétitions), projets, étapes et tâches, progression, priorités du jour, modèles, migrations, profil, images, sauvegardes (chiffrement, fichiers piégés, anciennes versions, annulation), réglages, traductions complètes, semaine, thème |
+| `npm run test:e2e` | 12 parcours × 2 appareils (téléphone et ordinateur) dans un vrai Chromium : Google Agenda (serveurs simulés), import de relevés et d'agenda, itinéraires, modèle → assistant → projet, tâches et priorités du jour, ajout rapide et idée → projet, accueil et besoins, photo sans EXIF, navigation, thème et langue, hors ligne, sauvegarde chiffrée, restauration (nouvel appareil et annulation), onglets multiples. Échoue à la moindre erreur console ou requête externe. |
 
 Première exécution des tests navigateur : `npx playwright install chromium`.
 

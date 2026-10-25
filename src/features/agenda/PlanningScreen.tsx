@@ -1,7 +1,10 @@
 import { unzipSync } from 'fflate';
 import { CalendarPlus, ChevronLeft, ChevronRight, MapPin, Navigation, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import { useApp } from '../../app/AppContext';
+import { ROUTES } from '../../app/paths';
+import { isPistisError } from '../../core/errors';
 import { useAsync } from '../../app/useAsync';
 import { toLocalDate } from '../../core/localDate';
 import { isSameDay, weekDays } from '../../core/week';
@@ -20,7 +23,50 @@ import {
   listCalendars,
   type AgendaItem,
 } from './agendaRepository';
+import { currentGoogleToken, googleAvailable, startGoogleAuth, takeGoogleAuthResult } from './googleAuth';
+import { getGoogleSelection, syncGoogle } from './googleCalendar';
 import { parseIcs } from './ical';
+
+const GOOGLE_SYNC_EVERY = 15 * 60_000;
+type GoogleState = 'idle' | 'syncing' | 'needAuth' | 'needConsent';
+
+/**
+ * Google Agenda : à l'ouverture du Planning, si la dernière copie date de plus de 15 minutes et que
+ * l'autorisation est encore valable, on recopie en arrière-plan. Sinon on propose de l'actualiser.
+ */
+function useGoogleAutoSync(): { state: GoogleState; refresh: () => void } {
+  const { db, reload } = useApp();
+  const [state, setState] = useState<GoogleState>('idle');
+  useEffect(() => {
+    if (!googleAvailable()) return;
+    let alive = true;
+    const result = takeGoogleAuthResult();
+    void (async () => {
+      const selection = await getGoogleSelection(db);
+      if (!selection.calendars.length || !alive) return;
+      if (result && !result.ok) return setState('needConsent');
+      const token = currentGoogleToken();
+      if (!token) return setState('needAuth');
+      if (selection.lastSync && Date.now() - selection.lastSync < GOOGLE_SYNC_EVERY) return;
+      setState('syncing');
+      try {
+        await syncGoogle(db, token.accessToken);
+        if (alive) {
+          setState('idle');
+          reload();
+        }
+      } catch (e) {
+        if (alive) setState(isPistisError(e) && e.code === 'google.expired' ? 'needAuth' : 'idle');
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+    // Une seule fois à l'ouverture de l'écran.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [db]);
+  return { state, refresh: () => startGoogleAuth(true) };
+}
 
 const MAX_FILE = 20 * 1024 * 1024;
 
@@ -32,6 +78,7 @@ export function PlanningScreen() {
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [directions, setDirections] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const google = useGoogleAutoSync();
   const days = weekDays(selected);
   const today = new Date();
   const todayISO = toLocalDate(today);
@@ -107,6 +154,23 @@ export function PlanningScreen() {
         }
       />
       {message && <PMessage tone={message.tone}>{message.text}</PMessage>}
+      {google.state === 'syncing' && <PMessage tone="info">{t('google.syncing')}</PMessage>}
+      {google.state === 'needAuth' && (
+        <PMessage tone="info">
+          {t('google.needRefresh')}{' '}
+          <button type="button" className="p-link p-link--button" onClick={google.refresh}>
+            {t('google.refresh')}
+          </button>
+        </PMessage>
+      )}
+      {google.state === 'needConsent' && (
+        <PMessage tone="attention">
+          {t('google.needConsent')}{' '}
+          <Link className="p-link" to={ROUTES.googleCalendar}>
+            {t('google.open')}
+          </Link>
+        </PMessage>
+      )}
 
       <PCard>
         <div className="p-month">

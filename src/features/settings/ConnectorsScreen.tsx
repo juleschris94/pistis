@@ -1,5 +1,6 @@
 import { CalendarDays, HeartPulse, Landmark, Map, ShieldCheck } from 'lucide-react';
 import { ROUTES } from '../../app/paths';
+import { googleAvailable } from '../agenda/googleAuth';
 import { INSTITUTIONS } from '../../content/institutions';
 import { PBadge, PCard, PList, PListRow, PTopBar } from '../../design-system/components';
 import { useI18n } from '../../i18n';
@@ -66,8 +67,16 @@ export function ConnectorsScreen() {
           <PListRow
             icon={CalendarDays}
             color="var(--cat-projects)"
-            title={t('connectors.agenda.sync')}
-            subtitle={t('connectors.agenda.sync.body')}
+            title={t('connectors.agenda.google')}
+            subtitle={t('connectors.agenda.google.body')}
+            to={ROUTES.googleCalendar}
+            trailing={googleAvailable() ? available : soon}
+          />
+          <PListRow
+            icon={CalendarDays}
+            color="var(--cat-projects)"
+            title={t('connectors.agenda.outlook')}
+            subtitle={t('connectors.agenda.outlook.body')}
             trailing={soon}
           />
         </PList>

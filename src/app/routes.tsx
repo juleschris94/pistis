@@ -7,6 +7,7 @@ import { ProjectDetailScreen } from '../features/projects/ProjectDetailScreen';
 import { ProjectsScreen } from '../features/projects/ProjectsScreen';
 import { TemplateScreen, TemplatesScreen } from '../features/projects/TemplatesScreen';
 import { ModuleScreen } from '../features/modules/ModuleScreen';
+import { GoogleCalendarScreen } from '../features/agenda/GoogleCalendarScreen';
 import { PlanningScreen } from '../features/agenda/PlanningScreen';
 import { AccountScreen } from '../features/finance/AccountScreen';
 import { FinanceImportScreen } from '../features/finance/FinanceImportScreen';
@@ -43,6 +44,7 @@ const routes: RouteObject[] = [
       { path: ROUTES.transactions, element: <TransactionsScreen /> },
       { path: ROUTES.account, element: <AccountScreen /> },
       { path: ROUTES.connectors, element: <ConnectorsScreen /> },
+      { path: ROUTES.googleCalendar, element: <GoogleCalendarScreen /> },
       { path: ROUTES.notifications, element: <NotificationsScreen /> },
       { path: ROUTES.settings, element: <SettingsScreen /> },
       { path: ROUTES.profileEdit, element: <ProfileEditScreen /> },

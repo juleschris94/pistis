@@ -18,7 +18,8 @@ export const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
   "script-src 'self' 'wasm-unsafe-eval'",
   "worker-src 'self'",
-  "connect-src 'self' blob:",
+  // Seule exception : l'API Google Agenda (lecture seule), appelée uniquement si l'utilisateur la connecte.
+  "connect-src 'self' blob: https://www.googleapis.com",
   "img-src 'self' blob: data:",
   "style-src 'self'",
   "font-src 'self'",

@@ -11,14 +11,15 @@ peuvent lire des comptes pour le compte d'un client, via les interfaces officiel
 à la place de l'utilisateur avec ses codes exposerait ses comptes en cas de fuite et peut lui faire perdre
 la protection de sa banque en cas de fraude.
 
-## État (version 0.3.0)
+## État (version 0.3.1)
 
 | Connecteur | Disponible | Comment |
 | --- | --- | --- |
 | Banques : La Banque Postale, BoursoBank, Hello bank!, Revolut, LCL, Crédit Agricole, BNP Paribas, Swile, autres | Oui | Import de relevés OFX ou CSV, lus dans l'appareil (`src/features/finance`) |
 | Banques : connexion automatique | Non, en préparation | Agrégateur agréé + relais (voir plus bas) |
 | Google Agenda, Outlook, Apple Calendrier | Oui | Import `.ics` (et `.zip` de Google), répétitions et fuseaux (`src/features/agenda`) |
-| Google Agenda, Outlook : synchronisation | Non, en préparation | OAuth directement depuis l'appareil |
+| Google Agenda : synchronisation | Oui, dès que l'application Google est créée (`src/config.ts`) | OAuth depuis l'appareil, lecture seule (`src/features/agenda/googleAuth.ts`, `googleCalendar.ts`) |
+| Outlook : synchronisation | Non, en préparation | Microsoft Graph, même principe |
 | Google Maps, Plans, Waze | Oui | Bouton « Y aller » : simple lien, aucune donnée envoyée par PISTIS |
 | Apple Santé, Health Connect | Non | Accessibles uniquement depuis une application installée (application Android) |
 
@@ -67,7 +68,15 @@ Swile n'apparaît pas dans les couvertures vérifiées : l'import de fichier res
 
 ## Agendas : synchronisation
 
-- Google Agenda : OAuth depuis le navigateur (pas de secret côté serveur), lecture seule.
+- Google Agenda (fait) : connexion OAuth « application web côté client » (`response_type=token`), lecture seule
+  (`calendar.readonly`), retour vérifié par un état aléatoire, jeton gardé une heure dans l'onglet seulement
+  (jamais en base ni en sauvegarde), seule adresse réseau autorisée : `https://www.googleapis.com`.
+  Google maintient ce mode pour les applications sans serveur mais recommande un échange de code côté serveur :
+  la version multi-utilisateurs passera par le relais PISTIS (jetons de renouvellement, pas de reconnexion horaire).
+- Créer l'application Google : console Google Cloud → nouveau projet → activer « Google Calendar API » →
+  Google Auth Platform (image de marque, audience « Externe » en test avec ses comptes testeurs, accès aux données :
+  `calendar.readonly`) → Clients → « Application Web », origine `https://juleschris94.github.io`,
+  URI de redirection `https://juleschris94.github.io/pistis/` → copier l'ID client dans `src/config.ts`.
   Le mode « test » de Google limite à 100 utilisateurs et expire les autorisations au bout de 7 jours ;
   au-delà, une vérification de l'application par Google est nécessaire.
 - Outlook : Microsoft Graph avec une application inscrite gratuitement (OAuth avec PKCE), lecture seule.

@@ -26,6 +26,7 @@ export const ROUTES = {
   backup: '/profil/sauvegardes',
   privacy: '/profil/confidentialite',
   connectors: '/profil/connecteurs',
+  googleCalendar: '/profil/connecteurs/google',
 } as const;
 
 export const projectPath = (id: string) => `/projets/${encodeURIComponent(id)}`;

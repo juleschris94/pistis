@@ -8,6 +8,8 @@ et à toute personne qui contribue.
 1. **100 % local.** Aucun appel réseau dans l'application : pas d'API, pas de télémétrie, pas de police ou
    d'image chargée depuis Internet. La politique de sécurité (`vite.config.ts`) le bloque, et les tests
    navigateur échouent à la moindre requête externe. Ne jamais l'assouplir pour « faire marcher » une bibliothèque.
+   Seule exception décidée avec l'utilisateur : `https://www.googleapis.com` (Google Agenda, lecture seule),
+   appelée uniquement après connexion volontaire. Toute nouvelle exception = décision écrite dans docs/connecteurs.md.
 2. **Aucune donnée inventée.** Pas de démonstration fictive présentée comme une fonctionnalité terminée.
 3. **Montants en centimes entiers** (`INTEGER`) avec un code devise. Jamais de nombres à virgule pour de l'argent.
 4. **Les simulations n'écrivent jamais** dans les tables réelles.

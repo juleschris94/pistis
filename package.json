@@ -1,6 +1,6 @@
 {
   "name": "pistis",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "type": "module",
   "description": "PISTIS — organise ta vie, développe ton potentiel, construis ton avenir. Application locale hors ligne.",

@@ -1,5 +1,19 @@
 # Historique des versions
 
+## 0.3.1 — 25 octobre 2026
+
+### Ajouté
+
+- **Google Agenda** (Profil → Connecteurs) : connexion en lecture seule, choix des agendas, copie sur l'appareil
+  (2 mois passés, 12 mois à venir), mise à jour automatique à l'ouverture du Planning (toutes les 15 minutes au plus),
+  déconnexion qui supprime les copies. S'active dès que l'identifiant de l'application Google est renseigné.
+- Test navigateur de bout en bout avec Google simulé (aller, retour, retour falsifié refusé, synchronisation).
+
+### Sécurité
+
+- Politique de sécurité : seule nouvelle adresse autorisée, `https://www.googleapis.com`. Autorisation Google
+  gardée une heure dans l'onglet, jamais en base ni dans les sauvegardes.
+
 ## 0.3.0 — 25 octobre 2026
 
 Finances et Planning deviennent utilisables ; premiers connecteurs, 100 % locaux.

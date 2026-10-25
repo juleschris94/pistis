@@ -1,3 +1,5 @@
+// Doit rester le premier import : traite le retour de la connexion Google avant le routeur.
+import './oauthReturn';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../design-system/tokens.css';

@@ -32,10 +32,12 @@ export async function importCalendar(
   name: string,
   fileName: string,
   clock: Clock = systemClock,
+  /** Synchronisation : un agenda vide est normal (il vide simplement l'ancienne copie). */
+  allowEmpty = false,
 ): Promise<{ sourceId: string; count: number; replaced: boolean }> {
   const cleanName = name.trim().slice(0, 80);
   if (!cleanName) throw new PistisError('calendar.unreadable');
-  if (!calendar.events.length) throw new PistisError('calendar.empty');
+  if (!calendar.events.length && !allowEmpty) throw new PistisError('calendar.empty');
   const existing = (await db.all<{ id: string }>('SELECT id FROM calendar_source WHERE name = ?', [cleanName]))[0];
   const sourceId = existing?.id ?? newId();
   const now = clock.now();
