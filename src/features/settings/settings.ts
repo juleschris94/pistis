@@ -29,7 +29,7 @@ export function detectLanguage(navigatorLanguages: readonly string[] = []): Lang
 }
 
 export function defaultSettings(language: Language = 'fr'): Settings {
-  return { theme: 'dark', language, categories: [...CATEGORY_IDS], reducedMotion: false, currency: 'EUR' };
+  return { theme: 'light', language, categories: [...CATEGORY_IDS], reducedMotion: false, currency: 'EUR' };
 }
 
 /** Lit des valeurs brutes et les rend sûres. Fonction pure, testable. */

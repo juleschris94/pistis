@@ -6,7 +6,7 @@ import type { ThemePreference } from '../features/settings/settings';
  * l'ouverture de la base (évite un flash de couleur). La base reste la référence.
  */
 const STORAGE_KEY = 'pistis-theme';
-const THEME_COLORS = { dark: '#07121f', light: '#f5f8fc' } as const;
+const THEME_COLORS = { dark: '#081a17', light: '#f8f3ea' } as const;
 
 export function resolveTheme(preference: ThemePreference, systemPrefersDark: boolean): 'dark' | 'light' {
   if (preference === 'system') return systemPrefersDark ? 'dark' : 'light';
@@ -41,7 +41,7 @@ export function applyThemePreference(preference: ThemePreference): void {
   }
 }
 
-/** Au démarrage : dernier thème connu, ou sombre par défaut. */
+/** Au démarrage : dernier thème connu, ou clair (crème) par défaut. */
 export function applyStoredTheme(): void {
   let stored: string | null;
   try {
@@ -49,7 +49,7 @@ export function applyStoredTheme(): void {
   } catch {
     stored = null;
   }
-  applyThemePreference(stored === 'light' || stored === 'system' ? stored : 'dark');
+  applyThemePreference(stored === 'dark' || stored === 'system' ? stored : 'light');
 }
 
 export function applyReducedMotion(reduced: boolean): void {

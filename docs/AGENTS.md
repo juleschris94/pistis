@@ -23,7 +23,7 @@ et à toute personne qui contribue.
 - `src/data/` : seul endroit où l'on parle à SQLite. Les écrans passent par des fonctions de dépôt
   (`getProfile`, `saveProfile`…).
 - `src/design-system/` : toute couleur, taille, rayon vient de `tokens.css`. Pas de valeur en dur dans un écran.
-  Texte sur un bouton principal : jetons `--action-bg` / `--action-text` (contraste vérifié), jamais le cyan de marque.
+  Texte sur un bouton principal : jetons `--action-bg` / `--action-text` (contraste vérifié), jamais une couleur de marque prise au hasard.
 - Textes, catégories, citations : à terme dans `src/content/` (JSON), jamais dispersés dans le code.
 
 ## Version d'essai

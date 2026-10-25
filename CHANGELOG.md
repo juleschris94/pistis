@@ -1,5 +1,18 @@
 # Historique des versions
 
+## 0.2.1 — 25 octobre 2026
+
+Nouvelle identité de couleurs « forêt et or », d'après le second modèle visuel.
+
+### Modifié
+
+- Thème clair crème par défaut ; thème sombre « nuit forestière ». Vert forêt pour les actions, or pour les accents,
+  la vision et le bouton « + ».
+- Priorités du jour dans une carte vert forêt avec bouton doré.
+- Domaines en tuiles pastel avec icône colorée (bronze, vert, corail, lavande, ardoise, olive).
+- Écran de bienvenue, illustrations de vision, logo et icônes de l'application recolorés.
+- Contrastes vérifiés dans les deux thèmes (docs/design-system.md).
+
 ## 0.2.0-m2 — 25 octobre 2026
 
 Jalon M2 : projets et priorités du jour, palette officielle, version d'essai.

@@ -13,7 +13,7 @@ test('bienvenue : lisible, sans compte, aucune requête externe, politique de s�
   await page.goto('./');
   await expect(page.getByRole('heading', { name: 'PISTIS' })).toBeVisible();
   await expect(page.getByText('pas de compte, pas d’e-mail, pas de cloud')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   const csp = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
   expect(csp).toContain("connect-src 'self'");
   watch.assertClean();
@@ -96,8 +96,8 @@ test('navigation : 5 onglets, notifications, profil et retour', async ({ page })
 test('thème, animations et langue : appliqués tout de suite et conservés', async ({ page }) => {
   await createProfile(page, 'JC');
   await page.goto('./#/profil/apparence');
-  await page.getByRole('radio', { name: 'Clair' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('radio', { name: 'Sombre' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.getByRole('radio', { name: 'Réduites' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
   await page.goto('./#/profil/langue');
@@ -106,7 +106,7 @@ test('thème, animations et langue : appliqués tout de suite et conservés', as
   await page.reload();
   await page.goto('./#/');
   await expect(page.getByRole('heading', { name: 'Hello JC! 👋' })).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
 });
 

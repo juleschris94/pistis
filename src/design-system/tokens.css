@@ -1,104 +1,157 @@
 /*
- * Jetons du design system PISTIS — identité « bleu nuit et cyan ».
+ * Jetons du design system PISTIS — identité « forêt et or » (modèle visuel du 25 octobre 2026).
  * Toute couleur, taille ou rayon de l'application vient d'ici : on ne met jamais de valeur
  * en dur dans un composant. Modifier l'identité = modifier ce fichier.
  *
- * Thème sombre par défaut ; le thème clair s'applique avec <html data-theme="light">.
- * Chaque couleur de texte a été vérifiée : contraste ≥ 4,5:1 sur son fond (WCAG AA).
+ * Thème clair « crème » par défaut ; le thème sombre « nuit forestière » s'applique avec
+ * <html data-theme="dark">. Chaque couleur de texte a été vérifiée : contraste ≥ 4,5:1 sur son fond (WCAG AA).
  */
 @import '@fontsource-variable/inter/wght.css';
 
 :root,
-:root[data-theme='dark'] {
-  color-scheme: dark;
-
-  /* Surfaces — palette officielle PISTIS (prompt de recréation, §6) */
-  --surface-background: #07121f;
-  --surface-sunken: #0b1b2e;
-  --surface-card: #10243b;
-  --surface-raised: #172f49;
-  --surface-overlay: rgba(7, 18, 31, 0.92);
-  --border-subtle: #1c3550;
-  --border-strong: #28425e;
-
-  /* Texte */
-  --text-primary: #f7fafc;
-  --text-secondary: #9eb0c5;
-  --text-muted: #70849c; /* légendes sur le fond uniquement (4,9:1) */
-
-  /* Marque */
-  --brand-primary: #00c7ff; /* cyan : mise en évidence, progression réelle */
-  --brand-blue: #2e8bff; /* bleu électrique : actions */
-  --brand-text: #5aa3ff; /* bleu lisible comme texte de lien (6:1) */
-  --brand-soft: rgba(46, 139, 255, 0.16);
-  --brand-secondary: #865cff; /* violet : projets, vision */
-  --brand-secondary-text: #a68bff;
-  --brand-champagne: #ffd08a;
-  --brand-gradient: linear-gradient(135deg, #2e8bff 0%, #00c7ff 100%);
-  --project-gradient: linear-gradient(135deg, #865cff 0%, #2e8bff 100%);
-  --success-gradient: linear-gradient(135deg, #10bfa5 0%, #00c7ff 100%);
-
-  /* Action principale : dégradé bleu électrique → cyan + texte bleu nuit (5,6:1 à 9,5:1) */
-  --action-bg: linear-gradient(135deg, #2e8bff 0%, #00c7ff 100%);
-  --action-solid: #2e8bff;
-  --action-text: #07121f;
-
-  /* États (le corail = erreurs et actions destructrices, jamais un objectif en retard) */
-  --status-positive: #10bfa5;
-  --status-positive-soft: rgba(16, 191, 165, 0.16);
-  --status-attention: #ffb547;
-  --status-attention-soft: rgba(255, 181, 71, 0.16);
-  --status-alert: #ff5964;
-  --status-alert-soft: rgba(255, 89, 100, 0.16);
-
-  /* Domaines : fonds profonds pour un texte blanc lisible (≥ 4,6:1) */
-  --cat-projects: #1f6feb;
-  --cat-finance: #0b7a69;
-  --cat-habits: #00799e;
-  --cat-admin: #6d45e0;
-  --cat-housing: #a85a00;
-  --cat-family: #c42b3a;
-
-  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px rgba(0, 4, 12, 0.35);
-  --shadow-floating: 0 16px 40px rgba(0, 4, 12, 0.55);
-}
-
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --surface-background: #f5f8fc;
-  --surface-sunken: #edf3f9;
-  --surface-card: #ffffff;
-  --surface-raised: #e6eef7;
-  --surface-overlay: rgba(245, 248, 252, 0.94);
-  --border-subtle: #dce5f0;
-  --border-strong: #c3d1e2;
+  /* Surfaces : crème chaud, cartes ivoire */
+  --surface-background: #f8f3ea;
+  --surface-sunken: #f1eadd;
+  --surface-card: #fffcf6;
+  --surface-raised: #f4ede1;
+  --surface-overlay: rgba(248, 243, 234, 0.94);
+  --border-subtle: #e9e0d1;
+  --border-strong: #d8ccb8;
 
-  --text-primary: #132236;
-  --text-secondary: #607389;
-  --text-muted: #607389;
+  /* Texte : vert forêt très profond plutôt que noir */
+  --text-primary: #12302b;
+  --text-secondary: #5c6662;
+  --text-muted: #6b726d;
 
-  --brand-primary: #009ec9;
-  --brand-blue: #1769e8;
-  --brand-text: #1769e8;
-  --brand-soft: rgba(23, 105, 232, 0.1);
-  --brand-secondary: #6d45e0;
-  --brand-secondary-text: #6d45e0;
-  --brand-champagne: #b26a00;
+  /* Marque */
+  --brand-primary: #1e8a69; /* vert sauge : progression réelle */
+  --brand-blue: #0e524b; /* vert forêt : actions (nom historique du jeton) */
+  --brand-text: #0e6b5f; /* liens (6,2:1) */
+  --brand-soft: rgba(14, 82, 75, 0.09);
+  --brand-secondary: #c9965a; /* or : vision imaginée */
+  --brand-secondary-text: #8a5a1f;
+  --brand-secondary-soft: rgba(201, 150, 90, 0.18);
+  --brand-champagne: #b07a3c;
+  --brand-gradient: linear-gradient(90deg, #0e524b 0%, #1e8a69 100%);
+  --progress-start: #0e524b;
+  --progress-end: #2fa37c;
+  --logo-a1: #14635a;
+  --logo-a2: #2fa37c;
+  --logo-b1: #0a3a35;
+  --logo-b2: #0e524b;
 
-  --action-bg: linear-gradient(135deg, #1769e8 0%, #1f6feb 100%);
-  --action-solid: #1769e8;
-  --action-text: #ffffff;
+  /* Action principale : vert forêt, texte crème (8,8:1) */
+  --action-bg: linear-gradient(135deg, #0e524b 0%, #14635a 100%);
+  --action-solid: #0e524b;
+  --action-text: #fffcf6;
+  --action-shadow: rgba(14, 82, 75, 0.28);
 
-  --status-positive: #0a7563;
-  --status-positive-soft: rgba(10, 117, 99, 0.12);
-  --status-attention: #965a00;
-  --status-attention-soft: rgba(150, 90, 0, 0.12);
-  --status-alert: #c42b3a;
-  --status-alert-soft: rgba(196, 43, 58, 0.1);
+  /* Bouton flottant « + » : or, signe blanc */
+  --fab-bg: linear-gradient(135deg, #b9824a 0%, #a26c35 100%);
+  --fab-text: #ffffff;
+  --fab-shadow: rgba(162, 108, 53, 0.4);
 
-  --shadow-card: 0 1px 2px rgba(19, 34, 54, 0.04), 0 8px 24px rgba(19, 34, 54, 0.06);
-  --shadow-floating: 0 16px 40px rgba(19, 34, 54, 0.16);
+  /* Carte mise en avant (priorités du jour) : forêt profonde */
+  --hero-surface: #123b35;
+  --hero-glow: rgba(230, 187, 132, 0.22);
+
+  /* États (le rouge = erreurs et actions destructrices, jamais un objectif en retard) */
+  --status-positive: #177356;
+  --status-positive-soft: rgba(30, 138, 105, 0.13);
+  --on-positive: #fffcf6;
+  --status-attention: #a84d14;
+  --status-attention-soft: rgba(222, 122, 52, 0.14);
+  --status-alert: #b83a2e;
+  --status-alert-soft: rgba(184, 58, 46, 0.1);
+
+  /* Domaines : couleurs terre, lisibles en icône sur fond teinté (≥ 4:1) */
+  --cat-projects: #9a5f22;
+  --cat-finance: #0e6b55;
+  --cat-habits: #b14d3a;
+  --cat-admin: #6a5f9e;
+  --cat-housing: #3f6f8f;
+  --cat-family: #557228;
+
+  /* Illustrations : voile sombre sous le texte posé sur une image */
+  --art-scrim: rgba(8, 32, 28, 0.88);
+  --art-badge: rgba(8, 32, 28, 0.7);
+  --art-text: #fdf9f3;
+  --backdrop: rgba(18, 48, 43, 0.45);
+
+  --shadow-card: 0 1px 2px rgba(18, 48, 43, 0.04), 0 8px 24px rgba(80, 60, 30, 0.07);
+  --shadow-floating: 0 16px 40px rgba(18, 48, 43, 0.18);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces : nuit forestière */
+  --surface-background: #081a17;
+  --surface-sunken: #0b211d;
+  --surface-card: #102c27;
+  --surface-raised: #173a33;
+  --surface-overlay: rgba(8, 26, 23, 0.92);
+  --border-subtle: #1d4038;
+  --border-strong: #2a5148;
+
+  --text-primary: #f7f1e6;
+  --text-secondary: #b5c2ba;
+  --text-muted: #8a9a92;
+
+  --brand-primary: #4cc79a;
+  --brand-blue: #e6bb84;
+  --brand-text: #7fd3b0;
+  --brand-soft: rgba(76, 199, 154, 0.14);
+  --brand-secondary: #e6bb84;
+  --brand-secondary-text: #ecc796;
+  --brand-secondary-soft: rgba(230, 187, 132, 0.16);
+  --brand-champagne: #e6bb84;
+  --brand-gradient: linear-gradient(90deg, #2fa37c 0%, #8fe0bd 100%);
+  --progress-start: #2fa37c;
+  --progress-end: #8fe0bd;
+  --logo-a1: #fdf9f3;
+  --logo-a2: #f0d3a0;
+  --logo-b1: #e6bb84;
+  --logo-b2: #c9965a;
+
+  /* Action principale : or, texte forêt (9,2:1) */
+  --action-bg: linear-gradient(135deg, #ecc796 0%, #d6a266 100%);
+  --action-solid: #e6bb84;
+  --action-text: #10231f;
+  --action-shadow: rgba(230, 187, 132, 0.25);
+
+  --fab-bg: linear-gradient(135deg, #ecc796 0%, #d6a266 100%);
+  --fab-text: #10231f;
+  --fab-shadow: rgba(0, 0, 0, 0.45);
+
+  --hero-surface: #15443b;
+  --hero-glow: rgba(230, 187, 132, 0.2);
+
+  --status-positive: #4cc79a;
+  --status-positive-soft: rgba(76, 199, 154, 0.16);
+  --on-positive: #082019;
+  --status-attention: #f2a35e;
+  --status-attention-soft: rgba(242, 163, 94, 0.16);
+  --status-alert: #f2786a;
+  --status-alert-soft: rgba(242, 120, 106, 0.16);
+
+  --cat-projects: #d9a05f;
+  --cat-finance: #4cc79a;
+  --cat-habits: #ec8a72;
+  --cat-admin: #ab9ee3;
+  --cat-housing: #7fb3d6;
+  --cat-family: #a4c46e;
+
+  --art-scrim: rgba(5, 20, 17, 0.9);
+  --art-badge: rgba(5, 20, 17, 0.72);
+  --art-text: #fdf9f3;
+  --backdrop: rgba(2, 10, 8, 0.6);
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-floating: 0 16px 40px rgba(0, 0, 0, 0.55);
 }
 
 :root {

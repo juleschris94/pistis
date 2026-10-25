@@ -6,11 +6,11 @@ import { migrate } from '../../data/migrations';
 import { detectLanguage, getSettings, parseSettings, saveSettings, settingsStatements } from './settings';
 
 describe('réglages', () => {
-  it('valeurs par défaut : sombre, tous les domaines, langue proposée', async () => {
+  it('valeurs par défaut : clair, tous les domaines, langue proposée', async () => {
     const db = await createMemoryDatabase();
     await migrate(db);
     expect(await getSettings(db, 'en')).toEqual({
-      theme: 'dark',
+      theme: 'light',
       language: 'en',
       categories: ['projects', 'finance', 'habits', 'admin', 'housing', 'family'],
       reducedMotion: false,
@@ -33,7 +33,7 @@ describe('réglages', () => {
 
   it('une valeur abîmée ne casse rien : on revient à la valeur par défaut', () => {
     expect(parseSettings({ theme: 'violet', language: 'de', categories: '{oups', reduced_motion: 'peut-être' })).toMatchObject({
-      theme: 'dark',
+      theme: 'light',
       language: 'fr',
       categories: ['projects', 'finance', 'habits', 'admin', 'housing', 'family'],
       reducedMotion: false,

@@ -343,21 +343,39 @@ button {
   animation: p-rise var(--motion-base) var(--ease) both;
 }
 
+/*
+ * Carte mise en avant : forêt profonde, comme l'en-tête du tableau de bord du modèle.
+ * Les jetons sont redéfinis à l'intérieur : tout ce qu'elle contient (tâches, liens, boutons)
+ * passe automatiquement en version claire sur fond sombre, contrastes vérifiés (≥ 6:1).
+ */
 .p-card--accent {
-  background:
-    radial-gradient(120% 140% at 100% 0%, rgba(0, 199, 255, 0.2), transparent 55%),
-    linear-gradient(135deg, rgba(46, 139, 255, 0.32), rgba(16, 36, 59, 0.2)), var(--surface-card);
-  border-color: rgba(46, 139, 255, 0.4);
+  --surface-card: var(--hero-surface);
+  --surface-raised: rgba(253, 249, 243, 0.1);
+  --border-subtle: rgba(253, 249, 243, 0.14);
+  --border-strong: rgba(253, 249, 243, 0.32);
+  --text-primary: #fdf9f3;
+  --text-secondary: #c3d3cb;
+  --text-muted: #c3d3cb;
+  --brand-text: #f0c98f;
+  --brand-primary: #f0c98f;
+  --brand-soft: rgba(240, 201, 143, 0.16);
+  --brand-champagne: #f0c98f;
+  --brand-secondary-text: #f0c98f;
+  --action-bg: linear-gradient(135deg, #f0cb98 0%, #dcad72 100%);
+  --action-solid: #e6bb84;
+  --action-text: #12302b;
+  --status-positive: #6fd4ad;
+  --on-positive: #0b2420;
+  --status-attention: #f6b06a;
+  color: var(--text-primary);
+  background: radial-gradient(120% 140% at 100% 0%, var(--hero-glow), transparent 55%), var(--hero-surface);
+  border-color: transparent;
 }
 
 .p-card--vision {
-  background: radial-gradient(120% 140% at 0% 100%, rgba(134, 92, 255, 0.28), transparent 60%), var(--surface-card);
-}
-
-:root[data-theme='light'] .p-card--accent {
   background:
-    radial-gradient(120% 140% at 100% 0%, rgba(0, 158, 201, 0.14), transparent 55%),
-    linear-gradient(135deg, rgba(23, 105, 232, 0.08), transparent), var(--surface-card);
+    radial-gradient(120% 140% at 0% 100%, var(--brand-secondary-soft), transparent 65%),
+    linear-gradient(135deg, var(--brand-secondary-soft), transparent 70%), var(--surface-card);
 }
 
 .p-card__header {
@@ -440,9 +458,10 @@ button {
   color: var(--surface-background);
 }
 
+/* Bouton doré de l'écran de bienvenue (posé sur l'illustration sombre) */
 .p-button--light {
-  background: #f8fafc;
-  color: #0f172a;
+  background: linear-gradient(135deg, #f0cb98 0%, #dcad72 100%);
+  color: #12302b;
 }
 
 /* ---- Formulaires ---------------------------------------------------------- */
@@ -573,7 +592,7 @@ button {
 }
 
 .p-badge--vision {
-  background: rgba(134, 92, 255, 0.18);
+  background: var(--brand-secondary-soft);
   color: var(--brand-secondary-text);
 }
 
@@ -633,15 +652,15 @@ button {
   min-height: 128px;
   padding: var(--space-4) var(--space-3);
   border-radius: var(--radius-tile);
-  border: 2px solid transparent;
-  color: #ffffff;
+  border: 2px solid color-mix(in srgb, var(--tile) 22%, var(--surface-card));
+  color: var(--text-primary);
   text-align: center;
   font-weight: 650;
   font-size: var(--text-small);
   line-height: 1.25;
   cursor: pointer;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--tile) 88%, #ffffff 12%) 0%, var(--tile) 100%);
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--tile) 30%, transparent);
+  /* Fond pastel teinté par la couleur du domaine, icône dans la couleur pleine (comme le modèle) */
+  background: color-mix(in srgb, var(--tile) 13%, var(--surface-card));
   transition:
     transform var(--motion-fast) var(--ease),
     opacity var(--motion-fast),
@@ -651,6 +670,7 @@ button {
 .p-tile svg {
   width: 34px;
   height: 34px;
+  color: var(--tile);
 }
 
 .p-tile:active {
@@ -658,13 +678,12 @@ button {
 }
 
 .p-tile[aria-pressed='false'] {
-  filter: saturate(0.25) brightness(0.75);
-  opacity: 0.7;
-  box-shadow: none;
+  filter: saturate(0.2);
+  opacity: 0.62;
 }
 
 .p-tile[aria-pressed='true'] {
-  border-color: rgba(255, 255, 255, 0.85);
+  border-color: var(--tile);
 }
 
 .p-tile__check {
@@ -676,13 +695,14 @@ button {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: #ffffff;
-  color: var(--tile);
+  background: var(--tile);
+  color: var(--surface-card);
 }
 
 .p-tile__check svg {
   width: 16px;
   height: 16px;
+  color: var(--surface-card);
 }
 
 .p-icon-box {
@@ -692,8 +712,8 @@ button {
   height: 40px;
   border-radius: 12px;
   flex: none;
-  color: #ffffff;
-  background: var(--tile, var(--surface-raised));
+  color: var(--tile, var(--text-secondary));
+  background: color-mix(in srgb, var(--tile, var(--text-secondary)) 13%, var(--surface-card));
 }
 
 .p-icon-box svg {
@@ -912,7 +932,7 @@ button {
 .p-week__day[aria-current='date'] .p-week__num {
   background: var(--action-bg);
   color: var(--action-text);
-  box-shadow: 0 6px 18px rgba(46, 139, 255, 0.35);
+  box-shadow: 0 6px 18px var(--action-shadow);
 }
 
 /* ---- Écran d'accueil (onboarding) ---------------------------------------- */
@@ -925,8 +945,8 @@ button {
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
-  color: #f8fafc;
-  background: #0f172a;
+  color: #fdf9f3;
+  background: #072a27;
 }
 
 .p-hero__art {
@@ -950,9 +970,13 @@ button {
 }
 
 .p-hero__mark {
+  --logo-a1: #fdf9f3;
+  --logo-a2: #f0d3a0;
+  --logo-b1: #e6bb84;
+  --logo-b2: #c9965a;
   width: 84px;
   height: 84px;
-  filter: drop-shadow(0 12px 32px rgba(46, 139, 255, 0.5));
+  filter: drop-shadow(0 12px 32px rgba(230, 187, 132, 0.45));
 }
 
 .p-hero__name {
@@ -965,16 +989,16 @@ button {
 .p-hero__tagline {
   font-size: 19px;
   line-height: 1.5;
-  color: #e2e8f0;
+  color: #efe6d6;
 }
 
 .p-hero__note {
   font-size: var(--text-small);
-  color: #cbd5e1;
+  color: #d3dcd5;
 }
 
 .p-hero .p-button--ghost {
-  color: #f8fafc;
+  color: #f0c98f;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -1268,8 +1292,8 @@ select.p-input {
 }
 
 .p-badge--on-art {
-  background: rgba(7, 18, 31, 0.72);
-  color: #f7fafc;
+  background: var(--art-badge);
+  color: var(--art-text);
   backdrop-filter: blur(6px);
 }
 
@@ -1333,14 +1357,14 @@ select.p-input {
   flex-direction: column;
   justify-content: flex-end;
   padding: var(--space-5);
-  color: #f7fafc;
+  color: var(--art-text);
 }
 
 .p-hero-art::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(7, 18, 31, 0) 30%, rgba(7, 18, 31, 0.88) 100%);
+  background: linear-gradient(180deg, transparent 30%, var(--art-scrim) 100%);
 }
 
 .p-hero-art > :not(svg):not(img) {
@@ -1349,7 +1373,7 @@ select.p-input {
 }
 
 .p-hero-art .p-title {
-  color: #f7fafc;
+  color: var(--art-text);
 }
 
 /* Tâches */
@@ -1398,7 +1422,7 @@ select.p-input {
 .p-task__check[aria-checked='true'] {
   background: var(--status-positive);
   border-color: var(--status-positive);
-  color: #07121f;
+  color: var(--on-positive);
 }
 
 .p-task__text {
@@ -1508,9 +1532,9 @@ select.p-input {
   height: 58px;
   border: 0;
   border-radius: 50%;
-  background: var(--action-bg);
-  color: var(--action-text);
-  box-shadow: 0 12px 28px rgba(46, 139, 255, 0.45);
+  background: var(--fab-bg);
+  color: var(--fab-text);
+  box-shadow: 0 12px 28px var(--fab-shadow);
   cursor: pointer;
   transition: transform var(--motion-fast) var(--ease);
 }
@@ -1536,7 +1560,7 @@ select.p-input {
   position: fixed;
   inset: 0;
   z-index: 40;
-  background: rgba(2, 8, 16, 0.6);
+  background: var(--backdrop);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -1622,7 +1646,7 @@ select.p-input {
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--brand-secondary-text);
+  color: #f0c98f; /* or clair, toujours posé sur le voile sombre d'une illustration (7:1) */
 }
 
 .p-vision-label svg {

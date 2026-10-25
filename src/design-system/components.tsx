@@ -405,8 +405,8 @@ export function PRing({ value, size = 104, label, valueText }: { value: number; 
       <svg width={size} height={size} aria-hidden="true">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#2e8bff" />
-            <stop offset="100%" stopColor="#00c7ff" />
+            <stop offset="0%" style={{ stopColor: 'var(--progress-start)' }} />
+            <stop offset="100%" style={{ stopColor: 'var(--progress-end)' }} />
           </linearGradient>
         </defs>
         <circle className="p-ring__track" cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} />

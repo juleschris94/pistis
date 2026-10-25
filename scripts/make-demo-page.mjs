@@ -17,6 +17,6 @@ const style = styleMatch[0].replace(/ rel="stylesheet"| crossorigin/g, '');
 const title = rest.match(/<title>[\s\S]*?<\/title>/)?.[0] ?? '<title>PISTIS</title>';
 const description = rest.match(/<meta name="description"[^>]*>/)?.[0] ?? '';
 
-const page = [title, description, '<meta name="theme-color" content="#07121f" />', style, '<div id="root"></div>', script, ''].join('\n');
+const page = [title, description, '<meta name="theme-color" content="#f8f3ea" />', style, '<div id="root"></div>', script, ''].join('\n');
 writeFileSync(output, page);
 console.log(`${output} : ${(page.length / 1024 / 1024).toFixed(2)} Mo`);

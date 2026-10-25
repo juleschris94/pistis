@@ -1,51 +1,54 @@
 # Design system PISTIS
 
-Identité « bleu nuit, bleu et cyan, accent champagne », inspirée du modèle visuel fourni le 25 octobre 2026 et de la palette officielle : thème sombre par défaut,
+Identité « forêt et or », inspirée des modèles visuels fournis le 25 octobre 2026 : thème sombre par défaut,
 cartes arrondies, tuiles colorées, une action principale par écran, navigation à 5 onglets.
 Tout est défini dans `src/design-system/tokens.css` ; aucun écran n'utilise de couleur en dur.
 
 ## Couleurs
 
-Palette officielle du cahier des charges (jalon M2). Contrastes mesurés sur les cartes (`#10243B` en sombre, blanc en clair).
+Identité « forêt et or », reprise du modèle visuel du 25 octobre 2026 : fond crème, vert forêt pour les actions,
+or pour les accents. Thème clair par défaut, thème sombre « nuit forestière ». Contrastes mesurés sur les cartes.
 
-| Rôle | Sombre (défaut) | Clair | Contraste |
+| Rôle | Clair (défaut) | Sombre | Contraste |
 | --- | --- | --- | --- |
-| Fond | `#07121F` | `#F5F8FC` | — |
-| Fond creusé | `#0B1B2E` | `#EDF3F9` | — |
-| Carte | `#10243B` | `#FFFFFF` | — |
-| Surface relevée (champs, boutons secondaires) | `#172F49` | `#E6EEF7` | — |
-| Texte principal | `#F7FAFC` | `#132236` | 15:1 · 16:1 |
-| Texte secondaire | `#9EB0C5` | `#607389` | 7,1:1 · 4,9:1 |
-| Cyan de marque (progression, accents) | `#00C7FF` | idem | — |
-| Bleu de marque, utilisé comme texte (liens) | `#5AA3FF` | `#1769E8` | 6,1:1 · 5:1 |
-| Bouton principal | dégradé `#2E8BFF → #00C7FF`, texte `#07121F` | dégradé `#1769E8 → #1F6FEB`, texte blanc | ≥ 5,6:1 · ≥ 4,6:1 |
-| Violet (vision imaginée) | `#865CFF`, texte `#A68BFF` | — | 5,8:1 |
-| Champagne (étoile du logo, épingle du jour) | `#FFD08A` | — | décoratif |
-| Positif | `#10BFA5` | `#0A7563` | 6,7:1 · 5,6:1 |
-| Attention (échéance dépassée) | `#FFB547` | `#965A00` | 8,9:1 · 5,6:1 |
-| Alerte (erreurs, suppression) | `#FF5964` | `#C42B3A` | 5,1:1 · 5,6:1 |
+| Fond | `#F8F3EA` crème | `#081A17` | — |
+| Carte | `#FFFCF6` ivoire | `#102C27` | — |
+| Surface relevée (champs, boutons secondaires) | `#F4EDE1` | `#173A33` | — |
+| Texte principal | `#12302B` | `#F7F1E6` | 13,8:1 · 13,2:1 |
+| Texte secondaire | `#5C6662` | `#B5C2BA` | 5,8:1 · 8:1 |
+| Bouton principal | vert forêt `#0E524B`, texte crème | or `#E6BB84`, texte `#10231F` | 8,8:1 · 9,2:1 |
+| Liens | `#0E6B5F` | `#7FD3B0` | 6,2:1 · 8,4:1 |
+| Progression réelle | `#0E524B → #2FA37C` | `#2FA37C → #8FE0BD` | décoratif |
+| Or (vision imaginée, étoile du logo) | `#C9965A`, texte `#8A5A1F` | `#E6BB84` | 5,8:1 · 9,3:1 |
+| Bouton « + » | or `#B9824A → #A26C35`, signe blanc | or clair, signe forêt | ≥ 3,4:1 (icône) |
+| Positif | `#177356` | `#4CC79A` | 5,2:1 · 7:1 |
+| Attention (échéance dépassée) | `#A84D14` terre cuite | `#F2A35E` | 5,6:1 · 7,2:1 |
+| Alerte (erreurs, suppression) | `#B83A2E` | `#F2786A` | 5,6:1 · 5,4:1 |
+
+**Carte mise en avant** (priorités du jour) : forêt profonde `#123B35` avec un halo doré, comme l'en-tête du
+tableau de bord du modèle. Elle redéfinit les jetons pour son contenu (texte crème, liens et bouton dorés) :
+les composants qu'elle contient s'adaptent seuls, contrastes ≥ 6:1.
 
 Règles :
 
 - Le rouge (alerte) est réservé aux erreurs et aux actions destructrices, jamais à une tâche en retard ni à une dépense :
-  une échéance dépassée s'affiche en ambre.
-- `--text-muted` (`#70849C`) ne s'utilise que sur le fond de page (4,9:1), jamais sur une carte.
-- Le violet signale ce qui est **imaginé** (vision) ; la progression réelle reste en bleu/cyan.
+  une échéance dépassée s'affiche en terre cuite.
+- `--text-muted` ne s'utilise que sur le fond de page, jamais pour un texte important.
+- L'or signale ce qui est **imaginé** (vision) et les accents ; la progression réelle reste verte.
 
-Domaines (tuiles, icônes, bannières de projet) : fonds profonds pour un texte blanc lisible ≥ 5:1.
+Domaines : tuiles et icônes en pastel teinté (13 % de la couleur), icône dans la couleur pleine (≥ 4:1).
 
-| Domaine | Couleur |
-| --- | --- |
-| Projets et carrière | `#1F6FEB` |
-| Finances et épargne | `#0B7A69` |
-| Habitudes et bien-être | `#00799E` |
-| Démarches administratives | `#6D45E0` |
-| Logement et patrimoine | `#A85A00` |
-| Famille et quotidien | `#C42B3A` |
+| Domaine | Clair | Sombre |
+| --- | --- | --- |
+| Projets et carrière | `#9A5F22` bronze | `#D9A05F` |
+| Finances et épargne | `#0E6B55` vert | `#4CC79A` |
+| Habitudes et bien-être | `#B14D3A` corail | `#EC8A72` |
+| Démarches administratives | `#6A5F9E` lavande | `#AB9EE3` |
+| Logement et patrimoine | `#3F6F8F` ardoise | `#7FB3D6` |
+| Famille et quotidien | `#557228` olive | `#A4C46E` |
 
-Illustrations de vision (`src/design-system/VisionArt.tsx`) : six scènes originales en SVG (sommet, ville, maison,
-route, bibliothèque, horizon), aucune image téléchargée. L'utilisateur peut les remplacer par sa propre photo
-(métadonnées supprimées).
+Illustrations (`VisionArt.tsx`, `HeroArt.tsx`) : scènes originales en SVG aux couleurs forêt, crème et or ;
+aucune image téléchargée. Logo : « P » vert sur fond clair, crème et or sur fond sombre (jetons `--logo-*`).
 
 ## Typographie
 
@@ -88,7 +91,7 @@ Espacements sur une grille de 4 px. Rayons : 20 px (cartes), 18 px (tuiles), 14 
 
 - Téléphone : barre de 5 onglets en bas, contenu sur une colonne.
 - Ordinateur (≥ 960 px) : barre latérale avec la marque, contenu centré (720 px maximum).
-- Thèmes : Clair, Système, Sombre (réglage dans Profil → Apparence).
+- Thèmes : Clair (défaut), Système, Sombre (réglage dans Profil → Apparence).
 - Animations : 150 à 240 ms ; supprimées si l'appareil ou le réglage PISTIS demande des animations réduites.
 
 ## Ton
